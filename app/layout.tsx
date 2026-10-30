@@ -21,7 +21,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${outfit.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Suspense fallback={children}>
+        <Suspense fallback={null}>
           <SiteChrome>{children}</SiteChrome>
         </Suspense>
         </body>
