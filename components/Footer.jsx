@@ -1,5 +1,7 @@
 import Image from 'next/image'
 
+const CURRENT_YEAR = '2026'
+
 const exploreLinks = [
   { label: 'Home', href: '#home' },
   { label: 'Property listings', href: '#listings' },
@@ -77,7 +79,7 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col gap-3 pt-6 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Gate Homes Booking. All rights reserved.</p>
+          <p>© {CURRENT_YEAR} Gate Homes Booking. All rights reserved.</p>
           <a href="#home" className="transition-colors hover:text-white">Back to top ↑</a>
         </div>
       </div>

@@ -10,14 +10,14 @@ const Hero = () => {
     >
       <div className="mx-auto flex min-h-[545px] w-full max-w-[1440px] flex-col justify-center px-6 pb-10 pt-14 sm:px-10 lg:min-h-[680px] 2xl:min-h-[760px] lg:px-[8.7%]">
         <p className="mb-6 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.22em] text-white sm:text-[11px]">
-          <span aria-hidden="true" className="h-px w-8 bg-[#094d2f]" />
+          <span aria-hidden="true" className="h-px w-8 bg-[#89bfa0]" />
           Lagos · Sales · Rentals · Land
         </p>
         <h1 id="hero-title" className="max-w-[760px] font-serif text-[42px] font-bold leading-[0.99] tracking-[-0.045em] sm:text-[56px] lg:text-[64px]">
-          Best deals on <span className="text-[#094d2f]">homes</span>,<br className="hidden sm:block" /> apartments and hotels.
+          Best deals on <span className="text-[#89bfa0]">homes</span>,<br className="hidden sm:block" /> apartments and hotels.
         </h1>
         <p className="mt-6 flex items-center gap-2 text-[15px] font-semibold text-white sm:text-[16px]">
-          <span aria-hidden="true" className="size-2 rounded-full bg-[#094d2f]" />
+          <span aria-hidden="true" className="size-2 rounded-full bg-[#89bfa0]" />
           24/7 customer service.
         </p>
 

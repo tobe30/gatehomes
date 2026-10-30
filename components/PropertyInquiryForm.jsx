@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { whatsappNumber } from '@/data/siteConfig'
 
 const savedInquiriesKey = 'gatehomes-property-inquiries'
@@ -8,6 +8,11 @@ const savedInquiriesKey = 'gatehomes-property-inquiries'
 export default function PropertyInquiryForm({ property }) {
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [minimumDate, setMinimumDate] = useState('')
+
+  useEffect(() => {
+    setMinimumDate(new Date().toISOString().slice(0, 10))
+  }, [])
 
   function handleSubmit(event) {
     event.preventDefault()
@@ -81,7 +86,7 @@ export default function PropertyInquiryForm({ property }) {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
         <div>
           <label htmlFor="preferred-date" className="mb-1.5 block text-xs font-semibold text-slate-700">Preferred date <span className="font-normal text-slate-500">(optional)</span></label>
-          <input id="preferred-date" name="preferredDate" type="date" min={new Date().toISOString().slice(0, 10)} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm" />
+          <input id="preferred-date" name="preferredDate" type="date" min={minimumDate || undefined} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm" />
         </div>
         <div>
           <label htmlFor="guest-count" className="mb-1.5 block text-xs font-semibold text-slate-700">Guests / visitors</label>
