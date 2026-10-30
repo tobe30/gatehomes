@@ -1,0 +1,14 @@
+'use client'
+
+import { usePathname } from 'next/navigation'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
+
+export default function SiteChrome({ children }) {
+  const pathname = usePathname()
+  const isAdmin = pathname === '/admin' || pathname.startsWith('/admin/')
+
+  if (isAdmin) return children
+
+  return <><Navbar />{children}<Footer /></>
+}
