@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import SiteChrome from "@/components/SiteChrome";
 
@@ -20,7 +21,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${outfit.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <SiteChrome>{children}</SiteChrome>
+        <Suspense fallback={children}>
+          <SiteChrome>{children}</SiteChrome>
+        </Suspense>
         </body>
     </html>
   );
