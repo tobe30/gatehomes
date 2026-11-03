@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { properties } from '@/data/properties'
+import { lagosLocationSuggestions } from '@/data/locations'
 
 function PropertyCard({ property }) {
   return (
@@ -38,31 +38,44 @@ function PropertyCard({ property }) {
   )
 }
 
-export default function ListingsCatalog({ initialQuery = '' }) {
+export default function ListingsCatalog({ properties = [], initialQuery = '', initialCheckin = '', initialCheckout = '', initialGuests = '' }) {
   const [query, setQuery] = useState(initialQuery)
   const [status, setStatus] = useState('all')
+  const [category, setCategory] = useState(initialCheckin || initialCheckout || initialGuests ? 'Shortlet' : 'all')
   const [area, setArea] = useState('all')
   const [sort, setSort] = useState('featured')
+  const [guestCount, setGuestCount] = useState(initialGuests)
+  const [checkin, setCheckin] = useState(initialCheckin)
+  const [checkout, setCheckout] = useState(initialCheckout)
 
   const filteredProperties = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
     const results = properties.filter((property) => {
       const matchesQuery = !normalizedQuery || `${property.title} ${property.location}`.toLowerCase().includes(normalizedQuery)
-      const matchesStatus = status === 'all' || property.status.toLowerCase() === status
+      const matchesCategory = category === 'all' || property.category === category
+      const matchesStatus = status === 'all' || (property.category === 'Property' && property.purpose.toLowerCase() === status)
       const matchesArea = area === 'all' || property.location.toLowerCase().includes(area)
-      return matchesQuery && matchesStatus && matchesArea
+      const matchesGuests = !guestCount || (property.category === 'Shortlet' && property.guests >= Number(guestCount))
+      // The listing schema stores check-in/check-out times, not date availability.
+      // Keep the requested dates as inquiry context; don't claim availability from them.
+      return matchesQuery && matchesCategory && matchesStatus && matchesArea && matchesGuests
     })
 
+    if (sort === 'featured') results.sort((a, b) => Number(b.isFeatured) - Number(a.isFeatured))
     if (sort === 'price-low') results.sort((a, b) => (a.priceValue ?? Infinity) - (b.priceValue ?? Infinity))
     if (sort === 'price-high') results.sort((a, b) => (b.priceValue ?? -Infinity) - (a.priceValue ?? -Infinity))
     return results
-  }, [query, status, area, sort])
+  }, [properties, query, status, category, area, sort, guestCount])
 
   function clearFilters() {
     setQuery('')
     setStatus('all')
+    setCategory('all')
     setArea('all')
     setSort('featured')
+    setGuestCount('')
+    setCheckin('')
+    setCheckout('')
   }
 
   return (
@@ -70,12 +83,12 @@ export default function ListingsCatalog({ initialQuery = '' }) {
       <section className="border-b border-stone-200 bg-[#f6f6f0] px-5 py-12 sm:px-8 sm:py-16">
         <div className="mx-auto max-w-[1116px]">
           <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.22em] text-emerald-900">Gate Homes listings</p>
-          <h1 className="font-serif text-[34px] font-bold leading-tight tracking-[-0.035em] text-slate-900 sm:text-[44px]">Find the perfect property</h1>
+          <h1 className="font-serif text-[34px] font-bold leading-tight tracking-[-0.035em] text-slate-900 sm:text-[44px]">Find your perfect listing</h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
-            Browse homes, apartments, and investment properties in Lagos. Filter by location and listing type to find the right fit.
+            Browse published homes, apartments, and shortlets from Gate Homes. Filter the current listings by category, purpose, and Lagos location.
           </p>
 
-          <div className="mt-8 grid gap-3 rounded-xl border border-stone-200 bg-white p-3 shadow-sm sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_auto]">
+          <div className="mt-8 grid gap-3 rounded-xl border border-stone-200 bg-white p-3 shadow-sm sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr_auto]">
             <label className="flex min-h-12 items-center gap-3 rounded-lg border border-stone-200 bg-stone-50 px-3.5 focus-within:border-emerald-800">
               <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
               <span className="sr-only">Search location or property</span>
@@ -83,14 +96,20 @@ export default function ListingsCatalog({ initialQuery = '' }) {
             </label>
             <label className="flex min-h-12 items-center rounded-lg border border-stone-200 bg-stone-50 px-3.5">
               <span className="sr-only">Listing type</span>
+              <select value={category} onChange={(event) => setCategory(event.target.value)} className="w-full bg-transparent text-sm text-slate-700 outline-none">
+                <option value="all">All listing categories</option><option value="Property">Properties</option><option value="Shortlet">Shortlets</option>
+              </select>
+            </label>
+            <label className="flex min-h-12 items-center rounded-lg border border-stone-200 bg-stone-50 px-3.5">
+              <span className="sr-only">Listing purpose</span>
               <select value={status} onChange={(event) => setStatus(event.target.value)} className="w-full bg-transparent text-sm text-slate-700 outline-none">
-                <option value="all">Buy or rent</option><option value="for sale">For sale</option><option value="for rent">For rent</option>
+                <option value="all">Any purpose</option><option value="for sale">For sale</option><option value="for rent">For rent</option>
               </select>
             </label>
             <label className="flex min-h-12 items-center rounded-lg border border-stone-200 bg-stone-50 px-3.5">
               <span className="sr-only">Location</span>
               <select value={area} onChange={(event) => setArea(event.target.value)} className="w-full bg-transparent text-sm text-slate-700 outline-none">
-                <option value="all">All Lagos locations</option><option value="lekki">Lekki</option><option value="ikoyi">Ikoyi</option><option value="ajah">Ajah</option><option value="oniru">Oniru</option><option value="ologolo">Ologolo</option>
+                <option value="all">All Lagos locations</option>{lagosLocationSuggestions.map((location) => <option key={location} value={location.toLowerCase()}>{location}</option>)}
               </select>
             </label>
             <button type="button" onClick={clearFilters} className="min-h-12 rounded-lg bg-emerald-800 px-5 text-sm font-semibold text-white transition-colors hover:bg-emerald-900">Clear filters</button>
@@ -102,8 +121,8 @@ export default function ListingsCatalog({ initialQuery = '' }) {
         <div className="mx-auto max-w-[1116px]">
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="font-serif text-2xl font-bold text-slate-900">Available properties</h2>
-              <p className="mt-1 text-sm text-slate-500">{filteredProperties.length} {filteredProperties.length === 1 ? 'property' : 'properties'} found</p>
+              <h2 className="font-serif text-2xl font-bold text-slate-900">Available listings</h2>
+              <p className="mt-1 text-sm text-slate-500">{filteredProperties.length} {filteredProperties.length === 1 ? 'listing' : 'listings'} found</p>
             </div>
             <label className="flex items-center gap-2 text-sm text-slate-600">
               Sort by
@@ -113,13 +132,17 @@ export default function ListingsCatalog({ initialQuery = '' }) {
             </label>
           </div>
 
+          {(checkin || checkout) && <p className="mb-5 rounded-lg border border-emerald-100 bg-emerald-50/70 px-4 py-3 text-sm leading-6 text-emerald-950">
+            Dates selected: {checkin || 'Check-in not selected'} to {checkout || 'Check-out not selected'}. Shortlet availability is confirmed directly with Gate Homes.
+          </p>}
+
           {filteredProperties.length > 0 ? (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {filteredProperties.map((property) => <PropertyCard key={property.title} property={property} />)}
             </div>
           ) : (
             <div className="rounded-xl border border-dashed border-stone-300 bg-white px-5 py-14 text-center">
-              <h3 className="font-serif text-xl font-semibold text-slate-900">No matching properties yet</h3>
+              <h3 className="font-serif text-xl font-semibold text-slate-900">No matching listings yet</h3>
               <p className="mt-2 text-sm text-slate-600">Try another location or clear the filters to see all available listings.</p>
               <button type="button" onClick={clearFilters} className="mt-5 rounded-lg bg-emerald-800 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-900">Show all properties</button>
             </div>

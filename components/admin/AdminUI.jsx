@@ -10,7 +10,7 @@ export function StatCard({ label, value, note, icon, accent = 'green' }) {
 }
 
 export function StatusPill({ status }) {
-  const styles = { Published: 'bg-emerald-50 text-emerald-800 ring-emerald-700/10', Draft: 'bg-slate-100 text-slate-600 ring-slate-500/10', 'For Sale': 'bg-emerald-50 text-emerald-800 ring-emerald-700/10', 'For Rent': 'bg-blue-50 text-blue-700 ring-blue-600/10', Unread: 'bg-amber-50 text-amber-800 ring-amber-700/10', Read: 'bg-slate-100 text-slate-600 ring-slate-500/10' }
+  const styles = { Published: 'bg-emerald-50 text-emerald-800 ring-emerald-700/10', Draft: 'bg-slate-100 text-slate-600 ring-slate-500/10', 'For Sale': 'bg-emerald-50 text-emerald-800 ring-emerald-700/10', 'For Rent': 'bg-blue-50 text-blue-700 ring-blue-600/10', Unread: 'bg-amber-50 text-amber-800 ring-amber-700/10', Read: 'bg-slate-100 text-slate-600 ring-slate-500/10', Pending: 'bg-amber-50 text-amber-800 ring-amber-700/10', Approved: 'bg-emerald-50 text-emerald-800 ring-emerald-700/10', Rejected: 'bg-rose-50 text-rose-700 ring-rose-700/10' }
   return <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold ring-1 ring-inset ${styles[status] || styles.Draft}`}><span className="size-1.5 rounded-full bg-current" />{status}</span>
 }
 

@@ -1,20 +1,27 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { logoutAction } from '@/actions/auth.action'
 import AdminIcon from './AdminIcon'
 import { useAdminData } from './AdminDataContext'
 
 const navigation = [
   { label: 'Dashboard', href: '/admin', icon: 'dashboard' },
-  { label: 'Properties', href: '/admin/properties', icon: 'properties' },
-  { label: 'Add Property', href: '/admin/properties/new', icon: 'plus' },
+  { label: 'Listings', href: '/admin/properties', icon: 'properties' },
+  { label: 'Listing', href: '/admin/properties/new', icon: 'plus' },
+  { label: 'Videos', href: '/admin/videos', icon: 'video' },
+  { label: 'Reviews', href: '/admin/reviews', icon: 'star' },
   { label: 'Inquiries', href: '/admin/inquiries', icon: 'inquiries' },
   { label: 'Settings', href: '/admin/settings', icon: 'settings' },
 ]
 
-function Sidebar({ pathname, onNavigate, onLogout, unreadCount }) {
+function getInitials(name = '') {
+  return name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'GH'
+}
+
+function Sidebar({ pathname, onNavigate, onLogout, unreadCount, adminProfile }) {
   return (
     <>
       <div className="flex h-[76px] items-center gap-3 border-b border-white/10 px-6">
@@ -39,8 +46,8 @@ function Sidebar({ pathname, onNavigate, onLogout, unreadCount }) {
       </div>
       <div className="mt-auto border-t border-white/10 p-4">
         <div className="mb-3 flex items-center gap-3 rounded-xl bg-white/5 p-3">
-          <span className="flex size-9 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-900">GH</span>
-          <div className="min-w-0"><p className="truncate text-xs font-semibold text-white">Gate Homes Admin</p><p className="mt-0.5 truncate text-[10px] text-white/45">admin@gatehomesbooking.com</p></div>
+          <span className="flex size-9 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-900">{getInitials(adminProfile?.name)}</span>
+          <div className="min-w-0"><p className="truncate text-xs font-semibold text-white">{adminProfile?.name || 'Gate Homes Admin'}</p><p className="mt-0.5 truncate text-[10px] text-white/45">{adminProfile?.email || 'Admin account'}</p></div>
         </div>
         <button type="button" onClick={onLogout} className="flex h-10 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium text-white/60 transition-colors hover:bg-white/7 hover:text-white"><AdminIcon name="logout" size={18} />Logout</button>
       </div>
@@ -49,9 +56,11 @@ function Sidebar({ pathname, onNavigate, onLogout, unreadCount }) {
 }
 
 const pageTitles = [
-  ['/admin/properties/new', 'Add Property'],
-  ['/admin/properties/', 'Edit Property'],
-  ['/admin/properties', 'Properties'],
+  ['/admin/properties/new', 'Add Listing'],
+  ['/admin/properties/', 'Edit Listing'],
+  ['/admin/properties', 'Listings'],
+  ['/admin/videos', 'Videos'],
+  ['/admin/reviews', 'Reviews'],
   ['/admin/inquiries', 'Inquiries'],
   ['/admin/settings', 'Settings'],
   ['/admin', 'Dashboard'],
@@ -60,20 +69,33 @@ const pageTitles = [
 export default function AdminShell({ children }) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { toast, notify, inquiries } = useAdminData()
+  const dataLoaded = useRef(false)
+  const dataLoading = useRef(false)
+  const { toast, inquiries, adminProfile, loadAdminData } = useAdminData()
   const unreadCount = inquiries.filter((inquiry) => !inquiry.read).length
   const pageTitle = pageTitles.find(([path]) => path === '/admin/properties/' ? pathname.includes('/edit') : path === '/admin' ? pathname === path : pathname === path || pathname.startsWith(path))?.[1] || 'Dashboard'
 
-  function logOut() {
-    notify('This is a frontend demo. Logout is not connected to an account.')
+  useEffect(() => {
+    if (pathname === '/admin/login' || dataLoaded.current || dataLoading.current) return
+    dataLoading.current = true
+    loadAdminData().then((loaded) => {
+      dataLoaded.current = loaded
+      dataLoading.current = false
+    })
+  }, [pathname, loadAdminData])
+
+  if (pathname === '/admin/login') return children
+
+  async function logOut() {
     setMobileOpen(false)
+    await logoutAction()
   }
 
   return (
     <div className="min-h-screen bg-[#f5f7f5] text-slate-900">
       {mobileOpen && <button aria-label="Close navigation" className="fixed inset-0 z-40 bg-slate-950/45 lg:hidden" onClick={() => setMobileOpen(false)} />}
       <aside className={`fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col bg-[#102b20] transition-transform duration-200 lg:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <Sidebar pathname={pathname} onNavigate={() => setMobileOpen(false)} onLogout={logOut} unreadCount={unreadCount} />
+      <Sidebar pathname={pathname} onNavigate={() => setMobileOpen(false)} onLogout={logOut} unreadCount={unreadCount} adminProfile={adminProfile} />
       </aside>
 
       <div className="min-h-screen lg:ml-[260px]">
@@ -83,9 +105,7 @@ export default function AdminShell({ children }) {
             <div><p className="text-[11px] font-medium text-slate-500">Gate Homes / <span className="text-slate-700">{pageTitle}</span></p><h1 className="mt-0.5 text-lg font-bold tracking-tight text-slate-900">{pageTitle}</h1></div>
           </div>
           <div className="flex items-center gap-3 sm:gap-5">
-            <span className="hidden rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-semibold text-amber-800 sm:block">Frontend demo</span>
-            <button type="button" onClick={() => notify('You are all caught up.')} aria-label="Notifications" className="relative flex size-10 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"><AdminIcon name="bell" /><span className="absolute right-2 top-2 size-2 rounded-full bg-emerald-600 ring-2 ring-white" /></button>
-            <span className="flex size-9 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-900">GH</span>
+            <span className="flex size-9 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-900">{getInitials(adminProfile?.name)}</span>
           </div>
         </header>
         <div className="mx-auto w-full max-w-[1440px] p-4 sm:p-7 lg:p-9">{children}</div>

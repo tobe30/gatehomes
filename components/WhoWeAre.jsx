@@ -17,6 +17,7 @@ export default function WhoWeAre() {
               src="/gate-homes-about.jpg"
               alt="Gate Homes representative in an office with Nigerian and American flags"
               fill
+              unoptimized
               sizes="(max-width: 1024px) 90vw, 430px"
               className="object-cover"
             />
@@ -36,7 +37,7 @@ export default function WhoWeAre() {
             Gate Homes started with one conviction: booking or buying a home in Lagos shouldn&apos;t feel like a gamble. We help you find, buy, sell, and invest across the city — sharing clear details about every property and guiding you through each step.
           </p>
           <p className="mt-4 max-w-[590px] text-[15px] leading-[1.75] text-[#526174]">
-            Our clients come to us looking for a place to stay or invest. They stay because we make the process straightforward and the details clear.
+            From giving our clients a great Airbnb experience to handing them the keys to their new homes, we make every step seamless, straightforward, and clear—turning dreams into addresses.
           </p>
 
           <div className="mt-7 border-t border-[#d9d9d0] pt-6">

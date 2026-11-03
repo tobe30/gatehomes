@@ -10,6 +10,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://gatehomesbooking.com"),
   title: "Gate Homes Booking",
   description: "Find homes, apartments, and stays across Lagos with Gate Homes.",
 };

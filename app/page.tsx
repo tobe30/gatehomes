@@ -1,24 +1,20 @@
+import { Suspense } from 'react'
 import Hero from '@/components/Hero'
-import FeaturedProperties from '@/components/FeaturedProperties'
-import LocationExplorer from '@/components/LocationExplorer'
-import ExploreShortlets from '@/components/ExploreShortlets'
-import WeekendDeals from '@/components/WeekendDeals'
+import HomePropertySections from '@/components/HomePropertySections'
 import WhoWeAre from '@/components/WhoWeAre'
 import PropertyVideos from '@/components/PropertyVideos'
-import React from 'react'
 
-const page = () => {
+export default function HomePage() {
   return (
     <div>
-      <Hero/>
-      <FeaturedProperties />
-      <LocationExplorer />
-      <ExploreShortlets />
-      <WeekendDeals />
+      <Hero />
+      <Suspense fallback={<div className="px-6 py-16 text-center text-sm text-slate-500">Loading current listings…</div>}>
+        <HomePropertySections />
+      </Suspense>
       <WhoWeAre />
-      <PropertyVideos />
+      <Suspense fallback={<div className="px-6 py-16 text-center text-sm text-slate-500">Loading property videos…</div>}>
+        <PropertyVideos />
+      </Suspense>
     </div>
   )
 }
-
-export default page
