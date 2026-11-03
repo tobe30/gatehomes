@@ -36,7 +36,7 @@ function Sidebar({ pathname, onNavigate, onLogout, unreadCount, adminProfile }) 
           {navigation.map((item) => {
             const active = item.href === '/admin' ? pathname === item.href : pathname === item.href || (item.href === '/admin/properties' && pathname.startsWith('/admin/properties/') && !pathname.endsWith('/new'))
             return (
-              <Link key={item.href} href={item.href} onClick={onNavigate} aria-current={active ? 'page' : undefined} className={`flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors ${active ? 'bg-white/12 text-white shadow-sm' : 'text-white/65 hover:bg-white/7 hover:text-white'}`}>
+              <Link key={item.href} href={item.href} onClick={() => onNavigate(item.href)} aria-current={active ? 'page' : undefined} className={`flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors ${active ? 'bg-white/12 text-white shadow-sm' : 'text-white/65 hover:bg-white/7 hover:text-white'}`}>
                 <AdminIcon name={item.icon} size={18} />{item.label}
                 {item.label === 'Inquiries' && unreadCount > 0 && <span className="ml-auto rounded-full bg-emerald-400/20 px-2 py-0.5 text-[10px] font-bold text-emerald-200">{unreadCount}</span>}
               </Link>
@@ -69,6 +69,7 @@ const pageTitles = [
 export default function AdminShell({ children }) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [dashboardPending, setDashboardPending] = useState(false)
   const dataLoaded = useRef(false)
   const dataLoading = useRef(false)
   const { toast, inquiries, adminProfile, loadAdminData } = useAdminData()
@@ -84,6 +85,10 @@ export default function AdminShell({ children }) {
     })
   }, [pathname, loadAdminData])
 
+  useEffect(() => {
+    setDashboardPending(false)
+  }, [pathname])
+
   if (pathname === '/admin/login') return children
 
   async function logOut() {
@@ -91,11 +96,16 @@ export default function AdminShell({ children }) {
     await logoutAction()
   }
 
+  function handleNavigate(href) {
+    setMobileOpen(false)
+    if (href === '/admin' && pathname !== '/admin') setDashboardPending(true)
+  }
+
   return (
     <div className="min-h-screen bg-[#f5f7f5] text-slate-900">
       {mobileOpen && <button aria-label="Close navigation" className="fixed inset-0 z-40 bg-slate-950/45 lg:hidden" onClick={() => setMobileOpen(false)} />}
       <aside className={`fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col bg-[#102b20] transition-transform duration-200 lg:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-      <Sidebar pathname={pathname} onNavigate={() => setMobileOpen(false)} onLogout={logOut} unreadCount={unreadCount} adminProfile={adminProfile} />
+      <Sidebar pathname={pathname} onNavigate={handleNavigate} onLogout={logOut} unreadCount={unreadCount} adminProfile={adminProfile} />
       </aside>
 
       <div className="min-h-screen lg:ml-[260px]">
@@ -110,6 +120,12 @@ export default function AdminShell({ children }) {
         </header>
         <div className="mx-auto w-full max-w-[1440px] p-4 sm:p-7 lg:p-9">{children}</div>
       </div>
+      {dashboardPending && <div role="status" aria-live="polite" className="fixed inset-x-0 bottom-0 top-[76px] z-20 flex items-center justify-center bg-[#f5f7f5]/80 px-5 backdrop-blur-[2px] lg:left-[260px]">
+        <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-lg">
+          <span aria-hidden="true" className="size-5 animate-spin rounded-full border-2 border-emerald-800/20 border-t-emerald-800" />
+          <span className="text-sm font-semibold text-slate-800">Opening dashboard…</span>
+        </div>
+      </div>}
       {toast && <div role="status" className={`fixed bottom-5 right-5 z-[70] flex max-w-sm items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-white shadow-xl ${toast.tone === 'error' ? 'bg-rose-700' : 'bg-[#102b20]'}`}><span className="flex size-6 items-center justify-center rounded-full bg-white/15">✓</span>{toast.message}</div>}
     </div>
   )

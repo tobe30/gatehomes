@@ -62,7 +62,7 @@ async function main() {
     throw new Error("Enter a valid email address.");
   }
   if (!process.env.AUTH_SECRET || process.env.AUTH_SECRET.length < 32) {
-    throw new Error("AUTH_SECRET is missing or too short. Configure it in .env.local first.");
+    throw new Error("AUTH_SECRET is missing or too short. Configure it in .env first.");
   }
 
   const password = await promptHidden("Admin password (minimum 8 characters): ");

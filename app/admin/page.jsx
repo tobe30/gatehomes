@@ -6,6 +6,10 @@ import AdminIcon from '@/components/admin/AdminIcon'
 import { useAdminData } from '@/components/admin/AdminDataContext'
 import { formatDate, formatPrice, StatCard, StatusPill } from '@/components/admin/AdminUI'
 
+function StatSkeleton({ label }) {
+  return <span role="status" aria-label={`Loading ${label}`} className="inline-block h-8 w-12 animate-pulse rounded-md bg-slate-100 align-middle" />
+}
+
 export default function AdminDashboardPage() {
   const { properties, propertiesLoading, inquiries, inquiriesLoading } = useAdminData()
   const published = properties.filter((property) => property.status === 'Published').length
@@ -25,9 +29,9 @@ export default function AdminDashboardPage() {
       </section>
 
       <section aria-label="Dashboard statistics" className="grid grid-cols-1 gap-4 min-[520px]:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Total listings" value={properties.length} note="In your current inventory" icon="properties" />
-        <StatCard label="Published listings" value={published} note="Visible to prospective clients" icon="eye" />
-        <StatCard label="Draft listings" value={drafts} note="Not yet published" icon="edit" accent="amber" />
+        <StatCard label="Total listings" value={propertiesLoading ? <StatSkeleton label="listings" /> : properties.length} note={propertiesLoading ? 'Loading listing data…' : 'In your current inventory'} icon="properties" />
+        <StatCard label="Published listings" value={propertiesLoading ? <StatSkeleton label="published listings" /> : published} note={propertiesLoading ? 'Loading listing data…' : 'Visible to prospective clients'} icon="eye" />
+        <StatCard label="Draft listings" value={propertiesLoading ? <StatSkeleton label="draft listings" /> : drafts} note={propertiesLoading ? 'Loading listing data…' : 'Not yet published'} icon="edit" accent="amber" />
         <StatCard label="Total inquiries" value={inquiriesLoading ? <span aria-label="Loading inquiries" className="inline-block h-8 w-12 animate-pulse rounded bg-slate-100 align-middle" /> : inquiries.length} note={inquiriesLoading ? 'Loading inquiry data…' : `${unread} unread inquiries`} icon="inquiries" accent="blue" />
       </section>
 
