@@ -59,7 +59,7 @@ function serializeProperty(property: Record<string, any>) {
     added: safeProperty.added instanceof Date
       ? safeProperty.added.toISOString().slice(0, 10)
       : String(safeProperty.added || ""),
-    images: (property.images || []).map((image) => ({
+    images: (property.images || []).map((image: PropertyImageInput) => ({
       ...image,
       src: image.url,
     })),
@@ -193,7 +193,7 @@ function normalizeProperty(input: PropertyInput, adminId: string): PropertyValid
   };
 }
 
-function makeSlug(title) {
+function makeSlug(title: string) {
   const base = title
     .toLowerCase()
     .normalize("NFKD")
@@ -288,7 +288,7 @@ export async function updatePropertyAction(id: string, input: PropertyInput) {
     await property.save();
 
     const retainedImageIds = new Set(normalized.data.images.map((image: { publicId: string }) => image.publicId));
-    const removedImageIds = previousImageIds.filter((publicId) => !retainedImageIds.has(publicId));
+    const removedImageIds = previousImageIds.filter((publicId: string) => !retainedImageIds.has(publicId));
     if (removedImageIds.length) {
       await Promise.allSettled(removedImageIds.map((publicId: string) => cloudinary.uploader.destroy(publicId)));
     }

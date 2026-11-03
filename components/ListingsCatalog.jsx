@@ -38,6 +38,7 @@ function PropertyCard({ property }) {
   )
 }
 
+/** @param {{ properties?: Array<Record<string, any>>, initialQuery?: string, initialCheckin?: string, initialCheckout?: string, initialGuests?: string }} props */
 export default function ListingsCatalog({ properties = [], initialQuery = '', initialCheckin = '', initialCheckout = '', initialGuests = '' }) {
   const [query, setQuery] = useState(initialQuery)
   const [status, setStatus] = useState('all')

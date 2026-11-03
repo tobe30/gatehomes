@@ -69,7 +69,7 @@ async function PropertyDetails({ params }: PropertyPageProps) {
 
             <div className="mt-7 flex flex-wrap gap-2 border-y border-stone-200 py-5">
               {property.features.map((feature) => <span key={feature} className="badge h-9 rounded-lg border-stone-200 bg-white px-3 text-xs font-medium text-slate-700">{feature}</span>)}
-              {property.amenities.map((amenity) => <span key={amenity} className="badge h-9 rounded-lg border-stone-200 bg-white px-3 text-xs font-medium text-slate-700">{amenity}</span>)}
+              {property.amenities.map((amenity: string) => <span key={amenity} className="badge h-9 rounded-lg border-stone-200 bg-white px-3 text-xs font-medium text-slate-700">{amenity}</span>)}
             </div>
 
             <section aria-labelledby="description-heading" className="py-8">
@@ -103,7 +103,7 @@ async function PropertyDetails({ params }: PropertyPageProps) {
             </div> : <div className="mt-5 grid gap-4 md:grid-cols-2">
               {reviews.map((review) => <article key={review.id} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_8px_24px_rgba(16,48,31,0.05)]">
                 <div className="flex items-start gap-3">
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-900">{review.name.split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase()}</span>
+                  <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-900">{review.name.split(/\s+/).slice(0, 2).map((part: string) => part[0]).join('').toUpperCase()}</span>
                   <div className="min-w-0 flex-1"><h3 className="truncate text-sm font-bold text-slate-900">{review.name}</h3><p className="mt-1 text-xs text-slate-500">{new Intl.DateTimeFormat('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(review.createdAt))}</p></div>
                   <span aria-label={`${review.rating} out of 5 stars`} className="shrink-0 text-sm tracking-wide text-emerald-700">{'★'.repeat(review.rating)}<span className="text-slate-300">{'★'.repeat(5 - review.rating)}</span></span>
                 </div>
