@@ -1,12 +1,16 @@
-import React from 'react'
-import { lagosLocationSuggestions } from '@/data/locations'
+'use client'
+
+import { useState } from 'react'
+import ListingSearchInput from '@/components/ListingSearchInput'
 
 const Hero = () => {
+  const [destination, setDestination] = useState('')
+
   return (
     <section
       id="home"
       aria-labelledby="hero-title"
-      className="relative isolate min-h-[545px] overflow-hidden bg-cover bg-[center_55%] text-white sm:bg-[center_62%] lg:bg-[center_67%] lg:min-h-[680px] 2xl:min-h-[760px]"
+      className="relative z-10 isolate min-h-[545px] overflow-visible bg-cover bg-[center_55%] text-white sm:bg-[center_62%] lg:bg-[center_67%] lg:min-h-[680px] 2xl:min-h-[760px]"
       style={{ backgroundImage: "linear-gradient(90deg, rgba(8, 12, 18, 0.66) 0%, rgba(8, 12, 18, 0.42) 58%, rgba(8, 12, 18, 0.30) 100%), linear-gradient(0deg, rgba(9, 16, 30, 0.82) 0%, transparent 57%), url('/hero-interior.png')" }}
     >
       <div className="mx-auto flex min-h-[545px] w-full max-w-[1440px] flex-col justify-center px-6 pb-10 pt-14 sm:px-10 lg:min-h-[680px] 2xl:min-h-[760px] lg:px-[8.7%]">
@@ -23,13 +27,14 @@ const Hero = () => {
         </p>
 
         <form action="/listings" method="get" className="mt-7 grid w-full grid-cols-1 gap-2 rounded-xl bg-white p-2.5 shadow-xl sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_auto] lg:gap-2.5">
-          <label className="flex min-h-[58px] items-center gap-3 rounded-lg border border-stone-200 bg-stone-50 px-3 text-slate-500 transition-colors focus-within:border-emerald-800 sm:col-span-2 lg:col-span-1 lg:min-w-0">
-            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z"/><circle cx="12" cy="9" r="2.2"/></svg>
-            <input name="destination" type="search" list="hero-location-suggestions" placeholder="Search location" aria-label="Search location" autoComplete="off" className="min-w-0 flex-1 bg-transparent text-[13px] text-slate-800 outline-none placeholder:text-slate-500" />
-          </label>
-          <datalist id="hero-location-suggestions">
-            {lagosLocationSuggestions.map((location) => <option key={location} value={location} />)}
-          </datalist>
+          <ListingSearchInput
+            value={destination}
+            onChange={setDestination}
+            placeholder="Search location"
+            label="Search location"
+            wrapperClassName="sm:col-span-2 lg:col-span-1"
+            fieldClassName="min-h-[58px] text-slate-500"
+          />
 
           <label htmlFor="hero-checkin" className="flex min-h-[58px] min-w-0 flex-col justify-center rounded-lg border border-stone-200 bg-stone-50 px-3 transition-colors focus-within:border-emerald-800">
             <span className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Check-in</span>

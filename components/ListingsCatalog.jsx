@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { lagosLocationSuggestions } from '@/data/locations'
+import ListingSearchInput from '@/components/ListingSearchInput'
 
 function PropertyCard({ property }) {
   return (
@@ -90,11 +91,14 @@ export default function ListingsCatalog({ properties = [], initialQuery = '', in
           </p>
 
           <div className="mt-8 grid gap-3 rounded-xl border border-stone-200 bg-white p-3 shadow-sm sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr_auto]">
-            <label className="flex min-h-12 items-center gap-3 rounded-lg border border-stone-200 bg-stone-50 px-3.5 focus-within:border-emerald-800">
-              <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-              <span className="sr-only">Search location or property</span>
-              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search location or property" className="w-full bg-transparent text-sm text-slate-800 outline-none placeholder:text-slate-500" />
-            </label>
+            <ListingSearchInput
+              value={query}
+              onChange={setQuery}
+              placeholder="Search location"
+              label="Search location"
+              wrapperClassName="sm:col-span-2 lg:col-span-1"
+              fieldClassName="min-h-12"
+            />
             <label className="flex min-h-12 items-center rounded-lg border border-stone-200 bg-stone-50 px-3.5">
               <span className="sr-only">Listing type</span>
               <select value={category} onChange={(event) => setCategory(event.target.value)} className="w-full bg-transparent text-sm text-slate-700 outline-none">

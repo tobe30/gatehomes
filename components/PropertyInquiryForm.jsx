@@ -78,12 +78,12 @@ export default function PropertyInquiryForm({ property }) {
         </div>
         <div>
           <label htmlFor="inquiry-email" className="mb-1.5 flex items-center justify-between gap-1 text-xs font-semibold text-slate-700">Email <span className="whitespace-nowrap text-[8px] font-medium text-emerald-800 sm:text-[9px]">(Discount on returning guest)</span></label>
-          <input id="inquiry-email" name="email" type="email" autoComplete="email" maxLength={150} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm" placeholder="you@example.com" />
+          <input id="inquiry-email" name="email" type="email" autoComplete="email" maxLength={150} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm text-slate-950 placeholder:text-slate-950" placeholder="you@example.com" />
         </div>
       </div>
       <div>
         <label htmlFor="booking-purpose" className="mb-1.5 block text-xs font-semibold text-slate-700">Purpose of booking</label>
-        <select id="booking-purpose" name="requestType" defaultValue="Normal stay" className="select select-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm">
+        <select id="booking-purpose" name="requestType" defaultValue="Normal stay" className="select select-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950 [&>option]:text-slate-950">
           <option>Normal stay</option>
           <option>Get together</option>
           <option>Party</option>
@@ -96,7 +96,7 @@ export default function PropertyInquiryForm({ property }) {
         </div>
         <div>
           <label htmlFor="guest-count" className="mb-1.5 block text-xs font-semibold text-slate-700">Guests / visitors</label>
-          <select id="guest-count" name="guests" defaultValue="1" className="select select-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm">
+          <select id="guest-count" name="guests" defaultValue="1" className="select select-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950 [&>option]:text-slate-950">
             {Array.from({ length: 50 }, (_, index) => index + 1).map((count) => <option key={count} value={count}>{count} {count === 1 ? 'person' : 'people'}</option>)}
           </select>
         </div>
