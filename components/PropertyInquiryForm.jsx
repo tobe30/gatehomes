@@ -109,7 +109,13 @@ export default function PropertyInquiryForm({ property }) {
       <button type="submit" disabled={saving} className="btn h-12 min-h-12 w-full rounded-lg border-0 bg-emerald-800 text-sm font-semibold text-white shadow-none hover:bg-emerald-900 disabled:opacity-70">
         {saving ? 'Saving inquiry…' : 'Send enquiry & proceed'}
       </button>
-      <p className="text-[11px] leading-5 text-slate-500">Your information is securely protected.</p>
+      <p className="flex items-center gap-2 rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2.5 text-xs font-semibold leading-5 text-emerald-950">
+        <svg aria-hidden="true" className="size-4 shrink-0 text-emerald-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+        <span>Your information is securely protected.</span>
+      </p>
     </form>
     {submitted && <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/55 p-4" role="presentation">
       <section role="dialog" aria-modal="true" aria-labelledby="inquiry-submitted-title" className="w-full max-w-md rounded-2xl border border-stone-200 bg-white p-6 shadow-2xl sm:p-7">

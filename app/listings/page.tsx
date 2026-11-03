@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import ListingsCatalog from '@/components/ListingsCatalog'
+import ListingsSkeleton from '@/components/ListingsSkeleton'
 import { getPublishedProperties } from '@/lib/publicProperties'
 
 export const metadata: Metadata = {
@@ -31,7 +32,7 @@ async function ListingsContent({ searchParams }: ListingsPageProps) {
 
 export default function ListingsPage(props: ListingsPageProps) {
   return (
-    <Suspense fallback={<main className="flex-1 px-5 py-20 text-center text-sm text-slate-500">Loading published listings…</main>}>
+    <Suspense fallback={<ListingsSkeleton />}>
       <ListingsContent {...props} />
     </Suspense>
   )

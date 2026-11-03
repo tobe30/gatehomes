@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import PropertyInquiryForm from '@/components/PropertyInquiryForm'
+import PropertyDetailsSkeleton from '@/components/PropertyDetailsSkeleton'
 import PropertyGallery from '@/components/PropertyGallery'
 import ReviewForm from '@/components/ReviewForm'
 import { getPublishedPropertyBySlug } from '@/lib/publicProperties'
@@ -69,7 +70,6 @@ async function PropertyDetails({ params }: PropertyPageProps) {
 
             <div className="mt-7 flex flex-wrap gap-2 border-y border-stone-200 py-5">
               {property.features.map((feature) => <span key={feature} className="badge h-9 rounded-lg border-stone-200 bg-white px-3 text-xs font-medium text-slate-700">{feature}</span>)}
-              {property.amenities.map((amenity: string) => <span key={amenity} className="badge h-9 rounded-lg border-stone-200 bg-white px-3 text-xs font-medium text-slate-700">{amenity}</span>)}
             </div>
 
             <section aria-labelledby="description-heading" className="py-8">
@@ -77,6 +77,23 @@ async function PropertyDetails({ params }: PropertyPageProps) {
               <p className="mt-4 max-w-3xl whitespace-pre-line text-[15px] leading-7 text-slate-600">{property.description}</p>
               {property.address && <p className="mt-4 text-sm text-slate-600"><span className="font-semibold text-slate-800">Address:</span> {property.address}</p>}
               <p className="mt-3 max-w-3xl text-[15px] leading-7 text-slate-600">Availability, price, and specifications can change. Send an inquiry to confirm the latest details with Gate Homes.</p>
+            </section>
+
+            <section aria-labelledby="amenities-heading" className="border-t border-stone-200 py-7">
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-900">Comfort and convenience</p>
+              <h2 id="amenities-heading" className="font-serif text-2xl font-bold text-slate-900">Amenities</h2>
+              {property.amenities.length > 0 ? (
+                <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+                  {property.amenities.map((amenity: string) => (
+                    <li key={amenity} className="flex min-h-12 items-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-slate-700">
+                      <span aria-hidden="true" className="flex size-6 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-xs font-bold text-emerald-800">✓</span>
+                      <span>{amenity}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-3 text-sm leading-6 text-slate-500">Amenities haven’t been added to this listing yet.</p>
+              )}
             </section>
           </div>
 
@@ -120,7 +137,7 @@ async function PropertyDetails({ params }: PropertyPageProps) {
 
 export default function PropertyDetailsPage(props: PropertyPageProps) {
   return (
-    <Suspense fallback={<main className="flex-1 px-5 py-20 text-center text-sm text-slate-500">Loading listing details…</main>}>
+    <Suspense fallback={<PropertyDetailsSkeleton />}>
       <PropertyDetails {...props} />
     </Suspense>
   )

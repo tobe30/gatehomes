@@ -25,7 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Suspense fallback={null}>
           <SiteChrome>{children}</SiteChrome>
         </Suspense>
-        </body>
+      </body>
     </html>
   );
 }

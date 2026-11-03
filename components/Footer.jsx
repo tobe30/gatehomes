@@ -46,17 +46,17 @@ export default function Footer() {
           <div>
             <h2 className="text-xs font-bold uppercase tracking-[0.18em] text-white/90">Contact Gate Homes</h2>
             <div className="mt-4 space-y-3">
-              <a href="tel:+2349035922740" className="group flex items-center gap-3 text-sm text-white/75 transition-colors hover:text-white">
+              <a href="tel:+2349035922740" className="group grid grid-cols-[36px_minmax(0,1fr)] items-center gap-3 text-sm leading-9 text-white/75 transition-colors hover:text-white">
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-emerald-300 transition-colors group-hover:bg-white/10">
                   <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.84.58 2.8.7a2 2 0 0 1 1.73 2.03Z"/></svg>
                 </span>
-                <span>+234 903 592 2740</span>
+                <span className="whitespace-nowrap tabular-nums">+234 903 592 2740</span>
               </a>
-              <a href="tel:+2348162343411" className="group flex items-center gap-3 text-sm text-white/75 transition-colors hover:text-white">
+              <a href="tel:+2348162343411" className="group grid grid-cols-[36px_minmax(0,1fr)] items-center gap-3 text-sm leading-9 text-white/75 transition-colors hover:text-white">
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-emerald-300 transition-colors group-hover:bg-white/10">
                   <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.84.58 2.8.7a2 2 0 0 1 1.73 2.03Z"/></svg>
                 </span>
-                <span>+234 816 234 3411</span>
+                <span className="whitespace-nowrap tabular-nums">+234 816 234 3411</span>
               </a>
               <a href="mailto:Gateshomes.realty@yahoo.com" className="group flex items-center gap-3 break-all text-sm text-white/75 transition-colors hover:text-white">
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-emerald-300 transition-colors group-hover:bg-white/10">
