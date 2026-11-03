@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 const stats = [
   { value: '8+', label: 'Years in Lagos' },
-  { value: '300+', label: 'Deals closed' },
+  { value: '100+', label: 'Deals closed' },
   { value: '120k', label: 'Video followers' },
 ]
 
