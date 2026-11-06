@@ -10,6 +10,7 @@ export default function PropertyInquiryForm({ property }) {
   const [saving, setSaving] = useState(false)
   const [minimumDate, setMinimumDate] = useState('')
   const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [whatsappUrl, setWhatsappUrl] = useState('')
 
@@ -100,11 +101,17 @@ export default function PropertyInquiryForm({ property }) {
           <legend className="mb-2 text-xs font-semibold text-slate-900">Date of booking</legend>
           <div>
             <label htmlFor="booking-start-date" className="mb-1.5 block text-xs font-medium text-slate-800">Start date</label>
-            <input id="booking-start-date" name="startDate" type="date" required min={minimumDate || undefined} value={startDate} onChange={(event) => setStartDate(event.target.value)} className="inquiry-date-field input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950" style={{ color: '#020617', WebkitTextFillColor: '#020617', colorScheme: 'light' }} />
+            <div className="relative">
+              <input id="booking-start-date" name="startDate" type="date" required min={minimumDate || undefined} value={startDate} onChange={(event) => setStartDate(event.target.value)} className="inquiry-date-field input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950" style={{ color: '#020617', WebkitTextFillColor: '#020617', colorScheme: 'light' }} />
+              {!startDate && <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-3 flex items-center pr-10 text-sm text-slate-500">Select start date</span>}
+            </div>
           </div>
           <div>
             <label htmlFor="booking-end-date" className="mb-1.5 block text-xs font-medium text-slate-800">End date</label>
-            <input id="booking-end-date" name="endDate" type="date" required min={startDate || minimumDate || undefined} className="inquiry-date-field input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950" style={{ color: '#020617', WebkitTextFillColor: '#020617', colorScheme: 'light' }} />
+            <div className="relative">
+              <input id="booking-end-date" name="endDate" type="date" required min={startDate || minimumDate || undefined} value={endDate} onChange={(event) => setEndDate(event.target.value)} className="inquiry-date-field input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950" style={{ color: '#020617', WebkitTextFillColor: '#020617', colorScheme: 'light' }} />
+              {!endDate && <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-3 flex items-center pr-10 text-sm text-slate-500">Select end date</span>}
+            </div>
           </div>
         </fieldset>
         <div>
