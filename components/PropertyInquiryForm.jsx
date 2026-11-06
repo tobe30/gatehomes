@@ -75,16 +75,16 @@ export default function PropertyInquiryForm({ property }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="inquiry-name" className="mb-1.5 block text-xs font-semibold text-slate-700">Full name</label>
-        <input id="inquiry-name" name="fullName" autoComplete="name" required maxLength={100} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm" placeholder="Your name" />
+        <input id="inquiry-name" name="fullName" autoComplete="name" required maxLength={100} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950 placeholder:!text-slate-700 placeholder:!opacity-100" placeholder="Your name" />
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
         <div>
           <label htmlFor="inquiry-phone" className="mb-1.5 block text-xs font-semibold text-slate-700">Phone number</label>
-          <input id="inquiry-phone" name="phone" type="tel" autoComplete="tel" required maxLength={30} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm" placeholder="Your phone number" />
+          <input id="inquiry-phone" name="phone" type="tel" autoComplete="tel" required maxLength={30} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950 placeholder:!text-slate-700 placeholder:!opacity-100" placeholder="Your phone number" />
         </div>
         <div>
           <label htmlFor="inquiry-email" className="mb-1.5 flex items-center justify-between gap-1 text-xs font-semibold text-slate-700">Email {isShortlet && <span className="whitespace-nowrap text-[8px] font-medium text-emerald-800 sm:text-[9px]">(Discount on returning guest)</span>}</label>
-          <input id="inquiry-email" name="email" type="email" autoComplete="email" maxLength={150} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm text-slate-950 placeholder:text-slate-950" placeholder="you@example.com" />
+          <input id="inquiry-email" name="email" type="email" autoComplete="email" maxLength={150} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950 placeholder:!text-slate-700 placeholder:!opacity-100" placeholder="you@example.com" />
         </div>
       </div>
       {isShortlet && <>
@@ -100,11 +100,11 @@ export default function PropertyInquiryForm({ property }) {
           <legend className="mb-2 text-xs font-semibold text-slate-900">Date of booking</legend>
           <div>
             <label htmlFor="booking-start-date" className="mb-1.5 block text-xs font-medium text-slate-800">Start date</label>
-            <input id="booking-start-date" name="startDate" type="date" required min={minimumDate || undefined} value={startDate} onChange={(event) => setStartDate(event.target.value)} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950" style={{ color: '#020617', WebkitTextFillColor: '#020617', colorScheme: 'light' }} />
+            <input id="booking-start-date" name="startDate" type="date" required min={minimumDate || undefined} value={startDate} onChange={(event) => setStartDate(event.target.value)} className="inquiry-date-field input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950" style={{ color: '#020617', WebkitTextFillColor: '#020617', colorScheme: 'light' }} />
           </div>
           <div>
             <label htmlFor="booking-end-date" className="mb-1.5 block text-xs font-medium text-slate-800">End date</label>
-            <input id="booking-end-date" name="endDate" type="date" required min={startDate || minimumDate || undefined} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950" style={{ color: '#020617', WebkitTextFillColor: '#020617', colorScheme: 'light' }} />
+            <input id="booking-end-date" name="endDate" type="date" required min={startDate || minimumDate || undefined} className="inquiry-date-field input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950" style={{ color: '#020617', WebkitTextFillColor: '#020617', colorScheme: 'light' }} />
           </div>
         </fieldset>
         <div>
@@ -116,7 +116,7 @@ export default function PropertyInquiryForm({ property }) {
       </>}
       <div>
         <label htmlFor="inquiry-message" className="mb-1.5 block text-xs font-semibold text-slate-700">Additional details <span className="font-normal text-slate-500">(optional)</span></label>
-        <textarea id="inquiry-message" name="message" rows={3} maxLength={1000} className="textarea textarea-bordered w-full rounded-lg border-stone-300 bg-white text-sm" placeholder="Tell us what you would like to know" />
+        <textarea id="inquiry-message" name="message" rows={3} maxLength={1000} className="textarea textarea-bordered w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950 placeholder:!text-slate-700 placeholder:!opacity-100" placeholder="Tell us what you would like to know" />
       </div>
       {error && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       <button type="submit" disabled={saving} className="btn h-12 min-h-12 w-full rounded-lg border-0 bg-emerald-800 text-sm font-semibold text-white shadow-none hover:bg-emerald-900 disabled:opacity-70">

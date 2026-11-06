@@ -20,3 +20,26 @@ body {
   font-family: var(--font-outfit), Arial, sans-serif;
 }
 
+/* Keep native date segments readable in mobile Safari and Chromium. */
+.inquiry-date-field {
+  color: #020617 !important;
+  -webkit-text-fill-color: #020617 !important;
+  opacity: 1 !important;
+}
+
+.inquiry-date-field::-webkit-datetime-edit,
+.inquiry-date-field::-webkit-datetime-edit-fields-wrapper,
+.inquiry-date-field::-webkit-datetime-edit-text,
+.inquiry-date-field::-webkit-datetime-edit-month-field,
+.inquiry-date-field::-webkit-datetime-edit-day-field,
+.inquiry-date-field::-webkit-datetime-edit-year-field {
+  color: #020617 !important;
+  -webkit-text-fill-color: #020617 !important;
+  opacity: 1 !important;
+}
+
+.inquiry-date-field::-webkit-date-and-time-value {
+  min-height: 1.25rem;
+  text-align: left;
+}
+
