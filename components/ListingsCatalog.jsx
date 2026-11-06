@@ -42,7 +42,6 @@ function PropertyCard({ property }) {
 /** @param {{ properties?: Array<Record<string, any>>, initialQuery?: string, initialCheckin?: string, initialCheckout?: string, initialGuests?: string }} props */
 export default function ListingsCatalog({ properties = [], initialQuery = '', initialCheckin = '', initialCheckout = '', initialGuests = '' }) {
   const [query, setQuery] = useState(initialQuery)
-  const [status, setStatus] = useState('all')
   const [category, setCategory] = useState(initialCheckin || initialCheckout || initialGuests ? 'Shortlet' : 'all')
   const [area, setArea] = useState('all')
   const [sort, setSort] = useState('featured')
@@ -55,23 +54,21 @@ export default function ListingsCatalog({ properties = [], initialQuery = '', in
     const results = properties.filter((property) => {
       const matchesQuery = !normalizedQuery || `${property.title} ${property.location}`.toLowerCase().includes(normalizedQuery)
       const matchesCategory = category === 'all' || property.category === category
-      const matchesStatus = status === 'all' || (property.category === 'Property' && property.purpose.toLowerCase() === status)
       const matchesArea = area === 'all' || property.location.toLowerCase().includes(area)
       const matchesGuests = !guestCount || (property.category === 'Shortlet' && property.guests >= Number(guestCount))
       // The listing schema stores check-in/check-out times, not date availability.
       // Keep the requested dates as inquiry context; don't claim availability from them.
-      return matchesQuery && matchesCategory && matchesStatus && matchesArea && matchesGuests
+      return matchesQuery && matchesCategory && matchesArea && matchesGuests
     })
 
     if (sort === 'featured') results.sort((a, b) => Number(b.isFeatured) - Number(a.isFeatured))
     if (sort === 'price-low') results.sort((a, b) => (a.priceValue ?? Infinity) - (b.priceValue ?? Infinity))
     if (sort === 'price-high') results.sort((a, b) => (b.priceValue ?? -Infinity) - (a.priceValue ?? -Infinity))
     return results
-  }, [properties, query, status, category, area, sort, guestCount])
+  }, [properties, query, category, area, sort, guestCount])
 
   function clearFilters() {
     setQuery('')
-    setStatus('all')
     setCategory('all')
     setArea('all')
     setSort('featured')
@@ -90,7 +87,7 @@ export default function ListingsCatalog({ properties = [], initialQuery = '', in
             Browse published homes, apartments, and shortlets from Gate Homes. Filter the current listings by category, purpose, and Lagos location.
           </p>
 
-          <div className="mt-8 grid gap-3 rounded-xl border border-stone-200 bg-white p-3 shadow-sm sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr_auto]">
+          <div className="mt-8 grid gap-3 rounded-xl border border-stone-200 bg-white p-3 shadow-sm sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_auto]">
             <ListingSearchInput
               value={query}
               onChange={setQuery}
@@ -106,12 +103,6 @@ export default function ListingsCatalog({ properties = [], initialQuery = '', in
               </select>
             </label>
             <label className="flex min-h-12 items-center rounded-lg border border-stone-200 bg-stone-50 px-3.5">
-              <span className="sr-only">Listing purpose</span>
-              <select value={status} onChange={(event) => setStatus(event.target.value)} className="w-full bg-transparent text-sm text-slate-700 outline-none">
-                <option value="all">Any purpose</option><option value="for sale">For sale</option><option value="for rent">For rent</option>
-              </select>
-            </label>
-            <label className="flex min-h-12 items-center rounded-lg border border-stone-200 bg-stone-50 px-3.5">
               <span className="sr-only">Location</span>
               <select value={area} onChange={(event) => setArea(event.target.value)} className="w-full bg-transparent text-sm text-slate-700 outline-none">
                 <option value="all">All Lagos locations</option>{lagosLocationSuggestions.map((location) => <option key={location} value={location.toLowerCase()}>{location}</option>)}
@@ -124,12 +115,12 @@ export default function ListingsCatalog({ properties = [], initialQuery = '', in
 
       <section className="px-5 py-10 sm:px-8 sm:py-12">
         <div className="mx-auto max-w-[1116px]">
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="font-serif text-2xl font-bold text-slate-900">Available listings</h2>
               <p className="mt-1 text-sm text-slate-500">{filteredProperties.length} {filteredProperties.length === 1 ? 'listing' : 'listings'} found</p>
             </div>
-            <label className="flex items-center gap-2 text-sm text-slate-600">
+            <label className="flex w-fit shrink-0 items-center gap-2 whitespace-nowrap text-sm text-slate-600">
               Sort by
               <select value={sort} onChange={(event) => setSort(event.target.value)} className="select select-bordered select-sm rounded-lg border-stone-300 bg-white text-slate-800">
                 <option value="featured">Featured</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option>

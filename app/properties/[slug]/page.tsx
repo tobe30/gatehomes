@@ -101,7 +101,7 @@ async function PropertyDetails({ params }: PropertyPageProps) {
             <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-900">Book or inspect</p>
               <h2 className="mt-2 font-serif text-2xl font-bold text-slate-900">Ask about this listing</h2>
-              <p className="mb-5 mt-2 text-sm leading-6 text-slate-600">Share your details and preferred option. We’ll save your inquiry and prepare your WhatsApp message.</p>
+              <p className="mb-5 mt-2 text-sm leading-6 text-slate-600">Share your details and our team will follow up. We’ll save your enquiry and prepare your WhatsApp message.</p>
               <PropertyInquiryForm property={property} />
             </div>
           </aside>

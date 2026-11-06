@@ -5,9 +5,11 @@ import { createInquiryAction } from '@/actions/inquiry.action'
 import { whatsappNumber } from '@/data/siteConfig'
 
 export default function PropertyInquiryForm({ property }) {
+  const isShortlet = property.category === 'Shortlet'
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const [minimumDate, setMinimumDate] = useState('')
+  const [startDate, setStartDate] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [whatsappUrl, setWhatsappUrl] = useState('')
 
@@ -28,7 +30,8 @@ export default function PropertyInquiryForm({ property }) {
       phone: String(form.get('phone') || '').trim(),
       email: String(form.get('email') || '').trim(),
       requestType: String(form.get('requestType') || ''),
-      preferredDate: String(form.get('preferredDate') || ''),
+      startDate: String(form.get('startDate') || ''),
+      endDate: String(form.get('endDate') || ''),
       guests: String(form.get('guests') || ''),
       message: String(form.get('message') || '').trim(),
     }
@@ -36,22 +39,25 @@ export default function PropertyInquiryForm({ property }) {
     try {
       const result = await createInquiryAction(inquiry)
       if (!result?.success) {
-        setError(result?.error || 'Your inquiry could not be saved. Please try again.')
+        setError(result?.error || 'Your enquiry could not be saved. Please try again.')
         setSaving(false)
         return
       }
 
       const message = [
-        'Hello Gate Homes, I would like to make a property inquiry.',
+        isShortlet
+          ? 'Hello Gate Homes, I would like to book this apartment'
+          : 'Hello Gate Homes, I would like to make a property enquiry.',
         `Property: ${result.propertyTitle}`,
         `Listing: ${window.location.origin}/properties/${property.slug}`,
         result.propertyImage && `Listing photo: ${result.propertyImage}`,
-        `Request: ${inquiry.requestType}`,
+        isShortlet && `Request: ${inquiry.requestType}`,
         `Name: ${inquiry.name}`,
         `Phone: ${inquiry.phone}`,
         inquiry.email && `Email: ${inquiry.email}`,
-        inquiry.preferredDate && `Preferred date: ${inquiry.preferredDate}`,
-        inquiry.guests && `Guests: ${inquiry.guests}`,
+        isShortlet && `Start date: ${inquiry.startDate}`,
+        isShortlet && `End date: ${inquiry.endDate}`,
+        isShortlet && inquiry.guests && `Guests: ${inquiry.guests}`,
         inquiry.message && `Message: ${inquiry.message}`,
       ].filter(Boolean).join('\n')
 
@@ -59,7 +65,7 @@ export default function PropertyInquiryForm({ property }) {
       setSubmitted(true)
       setSaving(false)
     } catch {
-      setError('Your inquiry could not be saved. Please check your connection and try again.')
+      setError('Your enquiry could not be saved. Please check your connection and try again.')
       setSaving(false)
     }
   }
@@ -77,30 +83,37 @@ export default function PropertyInquiryForm({ property }) {
           <input id="inquiry-phone" name="phone" type="tel" autoComplete="tel" required maxLength={30} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm" placeholder="Your phone number" />
         </div>
         <div>
-          <label htmlFor="inquiry-email" className="mb-1.5 flex items-center justify-between gap-1 text-xs font-semibold text-slate-700">Email <span className="whitespace-nowrap text-[8px] font-medium text-emerald-800 sm:text-[9px]">(Discount on returning guest)</span></label>
+          <label htmlFor="inquiry-email" className="mb-1.5 flex items-center justify-between gap-1 text-xs font-semibold text-slate-700">Email {isShortlet && <span className="whitespace-nowrap text-[8px] font-medium text-emerald-800 sm:text-[9px]">(Discount on returning guest)</span>}</label>
           <input id="inquiry-email" name="email" type="email" autoComplete="email" maxLength={150} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm text-slate-950 placeholder:text-slate-950" placeholder="you@example.com" />
         </div>
       </div>
-      <div>
-        <label htmlFor="booking-purpose" className="mb-1.5 block text-xs font-semibold text-slate-700">Purpose of booking</label>
-        <select id="booking-purpose" name="requestType" defaultValue="Normal stay" className="select select-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950 [&>option]:text-slate-950">
-          <option>Normal stay</option>
-          <option>Get together</option>
-          <option>Party</option>
-        </select>
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+      {isShortlet && <>
         <div>
-          <label htmlFor="preferred-date" className="mb-1.5 block text-xs font-semibold text-slate-700">Preferred date <span className="font-normal text-slate-500">(optional)</span></label>
-          <input id="preferred-date" name="preferredDate" type="date" min={minimumDate || undefined} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm" />
+          <label htmlFor="booking-purpose" className="mb-1.5 block text-xs font-semibold text-slate-700">Purpose of booking</label>
+          <select id="booking-purpose" name="requestType" defaultValue="Normal stay" className="select select-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950 [&>option]:text-slate-950">
+            <option>Normal stay</option>
+            <option>Get together</option>
+            <option>Party</option>
+          </select>
         </div>
+        <fieldset className="space-y-3">
+          <legend className="mb-2 text-xs font-semibold text-slate-900">Date of booking</legend>
+          <div>
+            <label htmlFor="booking-start-date" className="mb-1.5 block text-xs font-medium text-slate-800">Start date</label>
+            <input id="booking-start-date" name="startDate" type="date" required min={minimumDate || undefined} value={startDate} onChange={(event) => setStartDate(event.target.value)} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950" style={{ color: '#020617', WebkitTextFillColor: '#020617', colorScheme: 'light' }} />
+          </div>
+          <div>
+            <label htmlFor="booking-end-date" className="mb-1.5 block text-xs font-medium text-slate-800">End date</label>
+            <input id="booking-end-date" name="endDate" type="date" required min={startDate || minimumDate || undefined} className="input input-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950" style={{ color: '#020617', WebkitTextFillColor: '#020617', colorScheme: 'light' }} />
+          </div>
+        </fieldset>
         <div>
           <label htmlFor="guest-count" className="mb-1.5 block text-xs font-semibold text-slate-700">Guests / visitors</label>
           <select id="guest-count" name="guests" defaultValue="1" className="select select-bordered h-11 min-h-11 w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950 [&>option]:text-slate-950">
             {Array.from({ length: 50 }, (_, index) => index + 1).map((count) => <option key={count} value={count}>{count} {count === 1 ? 'person' : 'people'}</option>)}
           </select>
         </div>
-      </div>
+      </>}
       <div>
         <label htmlFor="inquiry-message" className="mb-1.5 block text-xs font-semibold text-slate-700">Additional details <span className="font-normal text-slate-500">(optional)</span></label>
         <textarea id="inquiry-message" name="message" rows={3} maxLength={1000} className="textarea textarea-bordered w-full rounded-lg border-stone-300 bg-white text-sm" placeholder="Tell us what you would like to know" />
@@ -120,12 +133,12 @@ export default function PropertyInquiryForm({ property }) {
     {submitted && <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/55 p-4" role="presentation">
       <section role="dialog" aria-modal="true" aria-labelledby="inquiry-submitted-title" className="w-full max-w-md rounded-2xl border border-stone-200 bg-white p-6 shadow-2xl sm:p-7">
         <div className="flex size-12 items-center justify-center rounded-full bg-emerald-100 text-xl font-bold text-emerald-800" aria-hidden="true">✓</div>
-        <h2 id="inquiry-submitted-title" className="mt-4 font-serif text-2xl font-bold text-slate-900">Inquiry submitted</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">Your details have been saved. Continue to WhatsApp to send the inquiry to Gate Homes.</p>
+        <h2 id="inquiry-submitted-title" className="mt-4 font-serif text-2xl font-bold text-slate-900">Enquiry submitted</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-600">Your details have been saved. Proceed to WhatsApp to confirm your enquiry.</p>
         <button type="button" onClick={() => window.location.assign(whatsappUrl)} className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-800 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-900">
           Continue to WhatsApp <span aria-hidden="true">→</span>
         </button>
-        <p className="mt-3 text-center text-[11px] leading-5 text-slate-500">Your listing and inquiry details will be ready to send in WhatsApp.</p>
+        <p className="mt-3 text-center text-[11px] leading-5 text-slate-500">A response to your enquiry is ready on WhatsApp.</p>
       </section>
     </div>}
     </>

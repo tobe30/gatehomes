@@ -22,7 +22,8 @@ export async function createInquiryAction(input: Record<string, unknown>) {
   const phone = String(input?.phone ?? "").trim();
   const email = String(input?.email ?? "").trim().toLowerCase();
   const requestType = String(input?.requestType ?? "");
-  const preferredDate = String(input?.preferredDate ?? "");
+  const startDate = String(input?.startDate ?? "");
+  const endDate = String(input?.endDate ?? "");
   const guests = Number(input?.guests);
   const message = String(input?.message ?? "").trim();
   const slug = String(input?.propertySlug ?? "").trim();
@@ -36,15 +37,6 @@ export async function createInquiryAction(input: Record<string, unknown>) {
   if (email && (email.length > 150 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) {
     return { error: "Enter a valid email address." };
   }
-  if (!inquiryTypes.has(requestType)) {
-    return { error: "Choose a valid purpose of booking." };
-  }
-  if (!validDate(preferredDate)) {
-    return { error: "Choose a valid preferred date." };
-  }
-  if (!Number.isInteger(guests) || guests < 1 || guests > 50) {
-    return { error: "Guests or visitors must be between 1 and 50." };
-  }
   if (message.length > 1000) {
     return { error: "Additional details must be 1,000 characters or fewer." };
   }
@@ -55,10 +47,27 @@ export async function createInquiryAction(input: Record<string, unknown>) {
   try {
     await connectDB();
     const property = await Property.findOne({ slug, status: "Published" })
-      .select("_id slug title image images")
+      .select("_id slug title category image images")
       .lean();
     if (!property) {
       return { error: "This listing is no longer available. Please refresh and choose another listing." };
+    }
+
+    const isShortlet = property.category === "Shortlet";
+    if (isShortlet && !inquiryTypes.has(requestType)) {
+      return { error: "Choose a valid purpose of booking." };
+    }
+    if (isShortlet && (!startDate || !endDate)) {
+      return { error: "Choose both a start date and an end date." };
+    }
+    if (isShortlet && (!validDate(startDate) || !validDate(endDate))) {
+      return { error: "Choose valid booking dates." };
+    }
+    if (isShortlet && endDate <= startDate) {
+      return { error: "The end date must be after the start date." };
+    }
+    if (isShortlet && (!Number.isInteger(guests) || guests < 1 || guests > 50)) {
+      return { error: "Guests or visitors must be between 1 and 50." };
     }
 
     const cover = (property.images || []).find((image: { isCover?: boolean }) => image.isCover)?.url;
@@ -69,12 +78,14 @@ export async function createInquiryAction(input: Record<string, unknown>) {
       propertySlug: property.slug,
       propertyTitle: property.title,
       propertyImage,
+      propertyCategory: isShortlet ? "Shortlet" : "Property",
       name,
       phone,
       email,
-      requestType,
-      preferredDate,
-      guests,
+      requestType: isShortlet ? requestType : "",
+      startDate: isShortlet ? startDate : "",
+      endDate: isShortlet ? endDate : "",
+      guests: isShortlet ? guests : null,
       message,
     });
 
@@ -108,11 +119,14 @@ function serializeInquiry(inquiry: Record<string, any>) {
     email: inquiry.email || "",
     phone: inquiry.phone,
     property: inquiry.propertyTitle,
+    propertyCategory: inquiry.propertyCategory || "Property",
     propertyId: String(inquiry.property),
     propertySlug: inquiry.propertySlug,
     propertyImage: inquiry.propertyImage || "",
     message: inquiry.message || "",
     requestType: inquiry.requestType,
+    startDate: inquiry.startDate || "",
+    endDate: inquiry.endDate || "",
     preferredDate: inquiry.preferredDate || "",
     guests: inquiry.guests,
     date: inquiry.createdAt instanceof Date
