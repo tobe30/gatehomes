@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: PropertyPageProps): Promise<M
     openGraph: {
       title: `${property.title} in ${property.location} | Gate Homes`,
       description: property.description.slice(0, 160),
+      url: `https://gatehomesbooking.com/properties/${property.slug}`,
       images: property.image ? [{ url: property.image, alt: property.alt }] : [],
     },
   }

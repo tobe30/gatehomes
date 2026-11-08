@@ -39,6 +39,10 @@ export default function WeekendDeals({ deals = [] }) {
                       <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z"/><circle cx="12" cy="9" r="2"/></svg>
                       {deal.location}
                     </p>
+                    {deal.amenities?.length > 0 && <div aria-label={`Amenities: ${deal.amenities.slice(0, 3).join(', ')}`} className="mt-2 flex flex-wrap gap-1.5">
+                      {deal.amenities.slice(0, 3).map((amenity) => <span key={amenity} className="rounded-full bg-emerald-50 px-2 py-1 text-[9px] font-medium leading-none text-emerald-900">{amenity}</span>)}
+                      {deal.amenities.length > 3 && <span className="rounded-full bg-stone-100 px-2 py-1 text-[9px] font-medium leading-none text-slate-600">+{deal.amenities.length - 3}</span>}
+                    </div>}
                     <div className="mt-auto border-t border-stone-200 pt-3 text-right">
                       {deal.originalPrice && <p className="text-[11px] text-slate-400 line-through">{deal.originalPrice}</p>}
                       <p className="mt-1 text-[16px] font-extrabold text-slate-900">{deal.price}<span className="ml-1 text-[11px] font-normal text-slate-500">{deal.period}</span></p>

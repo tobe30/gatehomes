@@ -13,7 +13,7 @@ import User from "@/models/User";
 import Property from "@/models/Property";
 
 const IMAGE_TRANSFORMATION = "c_limit,h_1600,w_2000";
-const MAX_PROPERTY_IMAGES = 5;
+const MAX_PROPERTY_IMAGES = 30;
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 
 type PropertyImageInput = {
@@ -72,10 +72,10 @@ function validateImages(
   required: boolean,
 ): ImageValidation {
   if (!Array.isArray(images) || images.length > MAX_PROPERTY_IMAGES) {
-    return { ok: false, error: "Add no more than five property images." };
+    return { ok: false, error: "Add no more than 30 property images." };
   }
-  if (required && images.length === 0) {
-    return { ok: false, error: "Add at least one image before publishing." };
+  if (required && images.length < 5) {
+    return { ok: false, error: "Add at least 5 property images before publishing." };
   }
 
   const ownerFolder = `gatehomes/properties/${adminId}/`;

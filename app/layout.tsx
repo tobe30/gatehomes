@@ -11,8 +11,24 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gatehomesbooking.com"),
-  title: "Gate Homes Booking",
-  description: "Find homes, apartments, and stays across Lagos with Gate Homes.",
+  title: "Gate Homes | Lagos Homes, Properties & Shortlets",
+  description:
+    "Explore homes, apartments and shortlets across Lagos for sale, rent or stay. Browse Gate Homes listings and contact our team.",
+  openGraph: {
+    type: "website",
+    url: "https://gatehomesbooking.com/",
+    siteName: "Gate Homes",
+    title: "Gate Homes | Lagos Homes, Properties & Shortlets",
+    description:
+      "Explore homes, apartments and shortlets across Lagos for sale, rent or stay.",
+    locale: "en_NG",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Gate Homes | Lagos Homes, Properties & Shortlets",
+    description:
+      "Explore homes, apartments and shortlets across Lagos for sale, rent or stay.",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

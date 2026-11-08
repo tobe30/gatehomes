@@ -10,8 +10,8 @@ import AdminIcon from './AdminIcon'
 import { useAdminData } from './AdminDataContext'
 import { PageHeading, PrimaryButton } from './AdminUI'
 
-const propertyTypes = ['Apartment', 'House', 'Duplex', 'Terrace', 'Land', 'Commercial']
-const shortletTypes = ['Apartment', 'House', 'Duplex', 'Terrace', 'Hotel room', 'Studio']
+const propertyTypes = ['Fully Detached Duplex', 'Terrace', 'Apartment', 'Flat', 'Shortlet', 'Duplex', 'Bungalow']
+const shortletTypes = propertyTypes
 const amenityOptions = ['Swimming pool', 'BQ', 'Parking', '24/7 security', 'Generator', 'Fitted kitchen', 'Serviced', 'Garden', 'Gym', 'Elevator']
 const fieldClass = 'mt-1.5 h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-800 outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10'
 const labelClass = 'block text-xs font-semibold text-slate-700'
@@ -132,8 +132,8 @@ export default function AdminPropertyForm({ mode = 'create', property }) {
       setImageError('Choose JPG, PNG or WebP images.')
       return
     }
-    if (images.length + files.length > 5) {
-      setImageError('You can add up to 5 images.')
+    if (images.length + files.length > 30) {
+      setImageError('You can add up to 30 images.')
       return
     }
     try {
@@ -182,10 +182,10 @@ export default function AdminPropertyForm({ mode = 'create', property }) {
       if (!form.location.trim()) nextErrors.location = 'Enter the property location.'
       if (!form.address.trim()) nextErrors.address = 'Enter the full address.'
       if (!form.description.trim()) nextErrors.description = 'Add a property description.'
-      if (!images.length) setImageError('Add at least one property image before publishing.')
+      if (images.length < 5) setImageError('Add at least 5 property images before publishing.')
     }
     setErrors(nextErrors)
-    if (Object.keys(nextErrors).length || (submitMode === 'Published' && !images.length)) return
+    if (Object.keys(nextErrors).length || (submitMode === 'Published' && images.length < 5)) return
 
     setSaving(true)
     try {
@@ -271,8 +271,8 @@ export default function AdminPropertyForm({ mode = 'create', property }) {
           <div className="mt-5"><p className={labelClass}>Amenities and features</p><div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">{amenityOptions.map((amenity) => <label key={amenity} className="flex min-h-10 cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 text-xs text-slate-600 transition-colors hover:border-emerald-300 hover:bg-emerald-50/40"><input type="checkbox" checked={form.amenities.includes(amenity)} onChange={() => toggleAmenity(amenity)} className="checkbox checkbox-sm rounded border-slate-300 [--chkbg:#166534] [--chkfg:white]"/>{amenity}</label>)}</div></div>
         </SectionCard>
 
-        <SectionCard title="Property photos" description="Upload up to 5 JPG, PNG or WebP images. Photos are resized and compressed before upload. Choose which image appears first in the listing.">
-          <label className={`flex min-h-36 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 text-center transition-colors ${images.length >= 5 || uploadingImages ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/40'}`}><span className="flex size-11 items-center justify-center rounded-xl bg-white text-emerald-800 shadow-sm"><AdminIcon name="plus" size={20}/></span><span className="mt-3 text-sm font-semibold text-slate-800">{uploadingImages ? 'Optimizing and uploading…' : 'Choose photos to upload'}</span><span className="mt-1 text-xs text-slate-500">{images.length} of 5 photos · each compressed to 1.5 MB or less</span><input type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={images.length >= 5 || uploadingImages || saving} onChange={addImages} className="sr-only"/></label>
+        <SectionCard title="Property photos" description="Add at least 5 and up to 30 JPG, PNG or WebP images. Photos are resized and compressed before upload. Choose which image appears first in the listing.">
+          <label className={`flex min-h-36 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 text-center transition-colors ${images.length >= 30 || uploadingImages ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/40'}`}><span className="flex size-11 items-center justify-center rounded-xl bg-white text-emerald-800 shadow-sm"><AdminIcon name="plus" size={20}/></span><span className="mt-3 text-sm font-semibold text-slate-800">{uploadingImages ? 'Optimizing and uploading…' : 'Choose photos to upload'}</span><span className="mt-1 text-xs text-slate-500">{images.length} of 30 photos · minimum 5 to publish · each compressed to 1.5 MB or less</span><input type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={images.length >= 30 || uploadingImages || saving} onChange={addImages} className="sr-only"/></label>
           {imageError && <p role="alert" className="mt-3 text-xs text-rose-600">{imageError}</p>}
           {images.length > 0 && <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">{images.map((image, index) => <div key={`${image.name}-${index}`} className={`relative overflow-hidden rounded-xl border bg-slate-100 ${coverIndex === index ? 'border-emerald-600 ring-2 ring-emerald-600/15' : 'border-slate-200'}`}><div className="relative aspect-[4/3]"><Image src={image.src} alt={image.name || `Property image ${index + 1}`} fill sizes="180px" className="object-cover"/></div><div className="flex items-center justify-between gap-2 p-2"><button type="button" onClick={() => setCoverIndex(index)} className={`truncate text-[10px] font-semibold ${coverIndex === index ? 'text-emerald-800' : 'text-slate-600 hover:text-emerald-800'}`}>{coverIndex === index ? 'Cover image' : 'Set as cover'}</button><button type="button" onClick={() => removeImage(index)} aria-label={`Remove image ${index + 1}`} className="flex size-7 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-700"><AdminIcon name="trash" size={14}/></button></div></div>)}</div>}
         </SectionCard>

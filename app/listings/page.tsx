@@ -7,6 +7,13 @@ import { getPublishedProperties } from '@/lib/publicProperties'
 export const metadata: Metadata = {
   title: 'Properties for Sale and Rent in Lagos | Gate Homes',
   description: 'Browse homes, apartments, and investment properties for sale and rent across Lagos with Gate Homes.',
+  alternates: { canonical: '/listings' },
+  openGraph: {
+    title: 'Properties for Sale and Rent in Lagos | Gate Homes',
+    description: 'Browse homes, apartments, and investment properties for sale and rent across Lagos with Gate Homes.',
+    url: 'https://gatehomesbooking.com/listings',
+    type: 'website',
+  },
 }
 
 type ListingsPageProps = {

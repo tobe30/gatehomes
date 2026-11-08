@@ -4,6 +4,11 @@ import HomePropertySections from '@/components/HomePropertySections'
 import WhoWeAre from '@/components/WhoWeAre'
 import PropertyVideos from '@/components/PropertyVideos'
 import HomeTestimonials from '@/components/HomeTestimonials'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+}
 
 export default function HomePage() {
   return (
