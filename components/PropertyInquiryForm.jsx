@@ -123,7 +123,7 @@ export default function PropertyInquiryForm({ property }) {
       </>}
       <div>
         <label htmlFor="inquiry-message" className="mb-1.5 block text-xs font-semibold text-slate-700">Additional details <span className="font-normal text-slate-500">(optional)</span></label>
-        <textarea id="inquiry-message" name="message" rows={3} maxLength={1000} className="textarea textarea-bordered w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950 placeholder:!text-slate-700 placeholder:!opacity-100" placeholder="Tell us what you would like to know" />
+        <textarea id="inquiry-message" name="message" rows={3} maxLength={1000} className="textarea textarea-bordered w-full rounded-lg border-stone-300 bg-white text-sm !text-slate-950 placeholder:!text-slate-700 placeholder:!opacity-100" placeholder="Additional information you will like us to know" />
       </div>
       {error && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       <button type="submit" disabled={saving} className="btn h-12 min-h-12 w-full rounded-lg border-0 bg-emerald-800 text-sm font-semibold text-white shadow-none hover:bg-emerald-900 disabled:opacity-70">

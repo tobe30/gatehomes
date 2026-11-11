@@ -9,7 +9,6 @@ export const lagosLocationSuggestions = [
   'Victoria Island',
   'Oniru',
   'Ikoyi',
-  'Old Ikoyi',
   'Ajah',
   'Ologolo',
 ]

@@ -100,9 +100,9 @@ async function PropertyDetails({ params }: PropertyPageProps) {
 
           <aside className="lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1">
             <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-900">Book or inspect</p>
-              <h2 className="mt-2 font-serif text-2xl font-bold text-slate-900">Ask about this listing</h2>
-              <p className="mb-5 mt-2 text-sm leading-6 text-slate-600">Share your details and our team will follow up. We’ll save your enquiry and prepare your WhatsApp message.</p>
+              {property.category === 'Shortlet' && <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-900">Shortlet booking</p>}
+              <h2 className="mt-2 font-serif text-2xl font-bold text-slate-900">{property.category === 'Shortlet' ? 'BOOK THIS UNIT' : 'ASK ABOUT THIS LISTING'}</h2>
+              <p className="mb-5 mt-2 text-sm leading-6 text-slate-600">Share your details; while our customer support sends you a response.</p>
               <PropertyInquiryForm property={property} />
             </div>
           </aside>

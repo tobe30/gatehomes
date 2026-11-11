@@ -30,7 +30,17 @@ function emptyPropertyForm() {
 }
 
 function TextField({ label, value, onChange, error, ...props }) {
-  return <label className={labelClass}>{label}<input {...props} value={value} onChange={(event) => onChange(event.target.value)} className={`${fieldClass} ${error ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : ''}`} />{error && <span className="mt-1 block text-[11px] text-rose-600">{error}</span>}</label>
+  const { formatNumber, type, inputMode, ...inputProps } = props
+  return <label className={labelClass}>{label}<input {...inputProps} type={formatNumber ? 'text' : type} inputMode={formatNumber ? 'numeric' : inputMode} value={value} onChange={(event) => onChange(formatNumber ? formatWithCommas(event.target.value) : event.target.value)} className={`${fieldClass} ${error ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : ''}`} />{error && <span className="mt-1 block text-[11px] text-rose-600">{error}</span>}</label>
+}
+
+function formatWithCommas(value) {
+  const digits = String(value).replace(/\D/g, '')
+  return digits ? new Intl.NumberFormat('en-NG').format(Number(digits)) : ''
+}
+
+function parseAmount(value) {
+  return Number(String(value).replace(/,/g, '')) || 0
 }
 
 function canvasToBlob(canvas, type, quality) {
@@ -43,29 +53,51 @@ async function optimizeImage(file) {
   if (file.size > 20 * 1024 * 1024) throw new Error(`${file.name} is over 20 MB. Choose a smaller photo.`)
 
   const bitmap = await createImageBitmap(file)
-  const scale = Math.min(1, 2000 / bitmap.width, 1600 / bitmap.height)
   const canvas = document.createElement('canvas')
-  canvas.width = Math.max(1, Math.round(bitmap.width * scale))
-  canvas.height = Math.max(1, Math.round(bitmap.height * scale))
   const context = canvas.getContext('2d')
   if (!context) {
     bitmap.close()
     throw new Error('This browser could not prepare the image for upload.')
   }
-  context.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
-  bitmap.close()
+  const maxBytes = 1.9 * 1024 * 1024
+  const baseScale = Math.min(1, 1800 / bitmap.width, 1400 / bitmap.height)
+  const sizeScales = [1, 0.85, 0.7, 0.58]
+  const formats = ['image/webp', 'image/jpeg']
+  const qualities = [0.84, 0.74, 0.64, 0.54, 0.44, 0.36]
+  let bestBlob = null
 
-  let blob
-  for (const quality of [0.84, 0.76, 0.68, 0.6, 0.52]) {
-    blob = await canvasToBlob(canvas, 'image/webp', quality)
-    if (blob.size <= 1.5 * 1024 * 1024) break
-  }
-  if (!blob || blob.size > 1.5 * 1024 * 1024) {
-    throw new Error(`${file.name} could not be compressed below 1.5 MB. Choose another photo.`)
+  try {
+    for (const sizeScale of sizeScales) {
+      canvas.width = Math.max(1, Math.round(bitmap.width * baseScale * sizeScale))
+      canvas.height = Math.max(1, Math.round(bitmap.height * baseScale * sizeScale))
+      context.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+
+      for (const format of formats) {
+        let previousType = ''
+        for (const quality of qualities) {
+          const blob = await canvasToBlob(canvas, format, quality)
+          if (blob.type !== format && blob.type === previousType) break
+          previousType = blob.type
+          if (!bestBlob || blob.size < bestBlob.size) bestBlob = blob
+          if (blob.size <= maxBytes) {
+            const extension = blob.type === 'image/jpeg' ? 'jpg' : blob.type === 'image/png' ? 'png' : 'webp'
+            const safeName = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '-')
+            return new File([blob], `${safeName || 'property-photo'}.${extension}`, { type: blob.type })
+          }
+        }
+      }
+    }
+  } finally {
+    bitmap.close()
   }
 
+  if (!bestBlob || bestBlob.size > maxBytes) {
+    throw new Error(`${file.name} is unusually large and could not be optimized enough. Try a smaller or lower-resolution photo.`)
+  }
+
+  const extension = bestBlob.type === 'image/jpeg' ? 'jpg' : bestBlob.type === 'image/png' ? 'png' : 'webp'
   const safeName = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '-')
-  return new File([blob], `${safeName || 'property-photo'}.webp`, { type: blob.type || 'image/webp' })
+  return new File([bestBlob], `${safeName || 'property-photo'}.${extension}`, { type: bestBlob.type })
 }
 
 async function uploadPropertyImage(file) {
@@ -173,11 +205,11 @@ export default function AdminPropertyForm({ mode = 'create', property }) {
       if (!form.type) nextErrors.type = 'Choose a property type.'
       if (!form.category) nextErrors.category = 'Choose Property or Shortlet.'
       if (form.category === 'Property' && !form.purpose) nextErrors.purpose = 'Choose sale or rent.'
-      if (!form.price || Number(form.price) <= 0) nextErrors.price = 'Enter a price greater than zero.'
+      if (!form.price || parseAmount(form.price) <= 0) nextErrors.price = 'Enter a price greater than zero.'
       if (form.category === 'Shortlet' && (!form.guests || Number(form.guests) < 1)) nextErrors.guests = 'Enter the maximum number of guests.'
       if (form.category === 'Shortlet' && form.checkin && form.checkout && form.checkout <= form.checkin) nextErrors.checkout = 'Check-out must be after check-in.'
-      if (form.discountPrice && Number(form.discountPrice) <= 0) nextErrors.discountPrice = 'Enter a discounted price greater than zero.'
-      if (form.discountPrice && Number(form.price) && Number(form.discountPrice) >= Number(form.price)) nextErrors.discountPrice = 'Discounted price must be less than the regular price.'
+      if (form.discountPrice && parseAmount(form.discountPrice) <= 0) nextErrors.discountPrice = 'Enter a discounted price greater than zero.'
+      if (form.discountPrice && parseAmount(form.price) && parseAmount(form.discountPrice) >= parseAmount(form.price)) nextErrors.discountPrice = 'Discounted price must be less than the regular price.'
       if (form.isDeal && !form.discountPrice) nextErrors.discountPrice = 'Add a discounted price to feature this as a deal.'
       if (!form.location.trim()) nextErrors.location = 'Enter the property location.'
       if (!form.address.trim()) nextErrors.address = 'Enter the full address.'
@@ -194,8 +226,8 @@ export default function AdminPropertyForm({ mode = 'create', property }) {
         title: form.title.trim(),
         location: form.location.trim(),
         address: form.address.trim(),
-        price: Number(form.price) || 0,
-        discountPrice: Number(form.discountPrice) || null,
+        price: parseAmount(form.price),
+        discountPrice: parseAmount(form.discountPrice) || null,
         guests: form.category === 'Shortlet' ? Number(form.guests) || 0 : null,
         checkin: form.category === 'Shortlet' ? form.checkin || '' : '',
         checkout: form.category === 'Shortlet' ? form.checkout || '' : '',
@@ -250,9 +282,9 @@ export default function AdminPropertyForm({ mode = 'create', property }) {
             <label className={labelClass}>Listing category *<select value={form.category} onChange={(event) => setField('category', event.target.value)} className={`${fieldClass} ${errors.category ? 'border-rose-400' : ''}`}><option>Property</option><option>Shortlet</option></select>{errors.category && <span className="mt-1 block text-[11px] text-rose-600">{errors.category}</span>}</label>
             <label className={labelClass}>{form.category === 'Shortlet' ? 'Accommodation type *' : 'Property type *'}<select value={form.type} onChange={(event) => setField('type', event.target.value)} className={`${fieldClass} ${errors.type ? 'border-rose-400' : ''}`}><option value="">Select type</option>{(form.category === 'Shortlet' ? shortletTypes : propertyTypes).map((type) => <option key={type}>{type}</option>)}</select>{errors.type && <span className="mt-1 block text-[11px] text-rose-600">{errors.type}</span>}</label>
             {form.category === 'Property' && <label className={labelClass}>Listing purpose *<select value={form.purpose} onChange={(event) => setField('purpose', event.target.value)} className={`${fieldClass} ${errors.purpose ? 'border-rose-400' : ''}`}><option>For Sale</option><option>For Rent</option></select>{errors.purpose && <span className="mt-1 block text-[11px] text-rose-600">{errors.purpose}</span>}</label>}
-            <TextField label={form.category === 'Shortlet' ? 'Nightly rate (₦) *' : 'Regular price (₦) *'} type="number" min="1" value={form.price} onChange={(value) => setField('price', value)} error={errors.price} placeholder={form.category === 'Shortlet' ? 'e.g. 150000' : 'e.g. 185000000'} />
-            <TextField label="Discounted price (₦)" type="number" min="1" value={form.discountPrice} onChange={(value) => setField('discountPrice', value)} error={errors.discountPrice} placeholder="Optional" />
-            {form.discountPrice && Number(form.price) > Number(form.discountPrice) && <p className="-mt-2 text-xs text-emerald-800 sm:col-span-2">Discount: {Math.round((1 - Number(form.discountPrice) / Number(form.price)) * 100)}% off the regular price.</p>}
+            <TextField label={form.category === 'Shortlet' ? 'Nightly rate (₦) *' : 'Regular price (₦) *'} formatNumber value={form.price} onChange={(value) => setField('price', value)} error={errors.price} placeholder={form.category === 'Shortlet' ? 'e.g. 150,000' : 'e.g. 185,000,000'} />
+            <TextField label="Discounted price (₦)" formatNumber value={form.discountPrice} onChange={(value) => setField('discountPrice', value)} error={errors.discountPrice} placeholder="Optional" />
+            {form.discountPrice && parseAmount(form.price) > parseAmount(form.discountPrice) && <p className="-mt-2 text-xs text-emerald-800 sm:col-span-2">Discount: {Math.round((1 - parseAmount(form.discountPrice) / parseAmount(form.price)) * 100)}% off the regular price.</p>}
             {form.category === 'Shortlet' && <TextField label="Maximum guests *" type="number" min="1" max="50" value={form.guests} onChange={(value) => setField('guests', value)} error={errors.guests} placeholder="e.g. 4" />}
             {form.category === 'Shortlet' && <>
               <TextField label="Available check-in date" type="date" value={form.checkin} onChange={(value) => setField('checkin', value)} placeholder="" />
@@ -272,7 +304,7 @@ export default function AdminPropertyForm({ mode = 'create', property }) {
         </SectionCard>
 
         <SectionCard title="Property photos" description="Add at least 5 and up to 30 JPG, PNG or WebP images. Photos are resized and compressed before upload. Choose which image appears first in the listing.">
-          <label className={`flex min-h-36 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 text-center transition-colors ${images.length >= 30 || uploadingImages ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/40'}`}><span className="flex size-11 items-center justify-center rounded-xl bg-white text-emerald-800 shadow-sm"><AdminIcon name="plus" size={20}/></span><span className="mt-3 text-sm font-semibold text-slate-800">{uploadingImages ? 'Optimizing and uploading…' : 'Choose photos to upload'}</span><span className="mt-1 text-xs text-slate-500">{images.length} of 30 photos · minimum 5 to publish · each compressed to 1.5 MB or less</span><input type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={images.length >= 30 || uploadingImages || saving} onChange={addImages} className="sr-only"/></label>
+          <label className={`flex min-h-36 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 text-center transition-colors ${images.length >= 30 || uploadingImages ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/40'}`}><span className="flex size-11 items-center justify-center rounded-xl bg-white text-emerald-800 shadow-sm"><AdminIcon name="plus" size={20}/></span><span className="mt-3 text-sm font-semibold text-slate-800">{uploadingImages ? 'Optimizing and uploading…' : 'Choose photos to upload'}</span><span className="mt-1 text-xs text-slate-500">{images.length} of 30 photos · minimum 5 to publish · each compressed to about 1.9 MB or less</span><input type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={images.length >= 30 || uploadingImages || saving} onChange={addImages} className="sr-only"/></label>
           {imageError && <p role="alert" className="mt-3 text-xs text-rose-600">{imageError}</p>}
           {images.length > 0 && <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">{images.map((image, index) => <div key={`${image.name}-${index}`} className={`relative overflow-hidden rounded-xl border bg-slate-100 ${coverIndex === index ? 'border-emerald-600 ring-2 ring-emerald-600/15' : 'border-slate-200'}`}><div className="relative aspect-[4/3]"><Image src={image.src} alt={image.name || `Property image ${index + 1}`} fill sizes="180px" className="object-cover"/></div><div className="flex items-center justify-between gap-2 p-2"><button type="button" onClick={() => setCoverIndex(index)} className={`truncate text-[10px] font-semibold ${coverIndex === index ? 'text-emerald-800' : 'text-slate-600 hover:text-emerald-800'}`}>{coverIndex === index ? 'Cover image' : 'Set as cover'}</button><button type="button" onClick={() => removeImage(index)} aria-label={`Remove image ${index + 1}`} className="flex size-7 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-700"><AdminIcon name="trash" size={14}/></button></div></div>)}</div>}
         </SectionCard>
