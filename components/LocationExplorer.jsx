@@ -5,43 +5,43 @@ import React from 'react'
 const areas = [
   {
     name: 'Ikoyi',
-    image: '/location-ikoyi.jpg',
-    alt: 'Aerial view of Ikoyi and Lagos Island',
+    image: '/location-ikoyi-upload.jpeg',
+    alt: 'Modern multi-unit residential property',
   },
   {
     name: 'Victoria Island',
-    image: '/oniru-serviced-apartment.jpg',
-    alt: 'Serviced apartment in Oniru, Victoria Island, Lagos',
+    image: '/location-victoria-island-upload.jpeg',
+    alt: 'Contemporary detached home with a paved courtyard',
   },
   {
     name: 'Lekki phase 1',
-    image: '/location-lekki-phase-1.jpg',
-    alt: 'Aerial view of a road in Lekki Phase 1',
+    image: '/location-lekki-phase-1-upload.jpeg',
+    alt: 'Modern multi-storey apartment building',
   },
   {
     name: 'Ikate',
-    image: '/ikate-apartment-building.jpg',
-    alt: 'Apartments in Ikate, Lekki',
+    image: '/location-ikate-upload.jpeg',
+    alt: 'Contemporary white home with glass balconies',
   },
   {
     name: 'Osapa London',
-    image: '/location-osapa-london.jpg',
-    alt: 'Residential property in Osapa London, Lekki',
+    image: '/location-osapa-london-upload.jpeg',
+    alt: 'Modern white residence with curved balconies',
   },
   {
     name: 'Chevron',
-    image: '/location-chevron.jpg',
-    alt: 'Residential property in Chevron, Lekki',
+    image: '/location-chevron-upload.jpeg',
+    alt: 'Modern white home with a dark exterior feature wall',
   },
   {
     name: 'Ajah',
-    image: '/location-ajah.jpg',
-    alt: 'Residential area in Ajah, Lagos',
+    image: '/location-ajah-upload.jpeg',
+    alt: 'Modern home with full-height glass windows',
   },
   {
     name: 'Ikota',
-    image: '/location-ikota.jpg',
-    alt: 'Townhouses in Ikota, Lekki',
+    image: '/location-ikota-upload.jpeg',
+    alt: 'Modern residence with a paved front courtyard',
   },
 ]
 

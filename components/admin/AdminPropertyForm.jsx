@@ -5,8 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createPropertyAction, updatePropertyAction, signPropertyImageUploadAction } from '@/actions/property.action'
-import { lagosLocationSuggestions } from '@/data/locations'
 import AdminIcon from './AdminIcon'
+import AdminLocationSelect from './AdminLocationSelect'
 import { useAdminData } from './AdminDataContext'
 import { PageHeading, PrimaryButton } from './AdminUI'
 
@@ -24,14 +24,14 @@ function emptyPropertyForm() {
   return {
     title: '', category: 'Property', type: '', purpose: 'For Sale', price: '',
     discountPrice: '', isDeal: false, isFeatured: false, guests: '',
-    checkin: '', checkout: '', location: '', address: '', beds: '', baths: '',
+    checkin: '', checkout: '', location: '', beds: '', baths: '',
     toilets: '', description: '', amenities: [],
   }
 }
 
 function TextField({ label, value, onChange, error, ...props }) {
-  const { formatNumber, type, inputMode, ...inputProps } = props
-  return <label className={labelClass}>{label}<input {...inputProps} type={formatNumber ? 'text' : type} inputMode={formatNumber ? 'numeric' : inputMode} value={value} onChange={(event) => onChange(formatNumber ? formatWithCommas(event.target.value) : event.target.value)} className={`${fieldClass} ${error ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : ''}`} />{error && <span className="mt-1 block text-[11px] text-rose-600">{error}</span>}</label>
+  const { formatNumber, type, inputMode, wrapperClassName, ...inputProps } = props
+  return <label className={`${labelClass} ${wrapperClassName || ''}`}>{label}<input {...inputProps} type={formatNumber ? 'text' : type} inputMode={formatNumber ? 'numeric' : inputMode} value={value} onChange={(event) => onChange(formatNumber ? formatWithCommas(event.target.value) : event.target.value)} className={`${fieldClass} ${error ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10' : ''}`} />{error && <span className="mt-1 block text-[11px] text-rose-600">{error}</span>}</label>
 }
 
 function formatWithCommas(value) {
@@ -141,7 +141,7 @@ export default function AdminPropertyForm({ mode = 'create', property }) {
   const router = useRouter()
   const { saveProperty, notify } = useAdminData()
   const [form, setForm] = useState(() => ({
-    title: property?.title || '', category: property?.category || 'Property', type: property?.type || '', purpose: property?.purpose || 'For Sale', price: property?.price ? String(property.price) : '', discountPrice: property?.discountPrice ? String(property.discountPrice) : '', isDeal: property?.isDeal || false, isFeatured: property?.isFeatured || false, guests: property?.guests ? String(property.guests) : '', checkin: property?.checkin || '', checkout: property?.checkout || '', location: property?.location || '', address: property?.address || '', beds: property?.beds || '', baths: property?.baths || '', toilets: property?.toilets || '', description: property?.description || '', amenities: property?.amenities || [],
+    title: property?.title || '', category: property?.category || 'Property', type: property?.type || '', purpose: property?.purpose || 'For Sale', price: property?.price ? String(property.price) : '', discountPrice: property?.discountPrice ? String(property.discountPrice) : '', isDeal: property?.isDeal || false, isFeatured: property?.isFeatured || false, guests: property?.guests ? String(property.guests) : '', checkin: property?.checkin || '', checkout: property?.checkout || '', location: property?.location || '', beds: property?.beds || '', baths: property?.baths || '', toilets: property?.toilets || '', description: property?.description || '', amenities: property?.amenities || [],
   }))
   const [images, setImages] = useState(() => property?.images?.length ? property.images.map((image) => typeof image === 'string' ? { src: image, url: image, name: 'Current image' } : { ...image, src: image.src || image.url, name: image.name || 'Property photo' }) : property?.image ? [{ src: property.image, url: property.image, name: 'Current cover image' }] : [])
   const [coverIndex, setCoverIndex] = useState(() => Math.max(0, property?.images?.findIndex((image) => typeof image === 'object' && image.isCover) ?? 0))
@@ -212,7 +212,6 @@ export default function AdminPropertyForm({ mode = 'create', property }) {
       if (form.discountPrice && parseAmount(form.price) && parseAmount(form.discountPrice) >= parseAmount(form.price)) nextErrors.discountPrice = 'Discounted price must be less than the regular price.'
       if (form.isDeal && !form.discountPrice) nextErrors.discountPrice = 'Add a discounted price to feature this as a deal.'
       if (!form.location.trim()) nextErrors.location = 'Enter the property location.'
-      if (!form.address.trim()) nextErrors.address = 'Enter the full address.'
       if (!form.description.trim()) nextErrors.description = 'Add a property description.'
       if (images.length < 5) setImageError('Add at least 5 property images before publishing.')
     }
@@ -225,7 +224,6 @@ export default function AdminPropertyForm({ mode = 'create', property }) {
         ...form,
         title: form.title.trim(),
         location: form.location.trim(),
-        address: form.address.trim(),
         price: parseAmount(form.price),
         discountPrice: parseAmount(form.discountPrice) || null,
         guests: form.category === 'Shortlet' ? Number(form.guests) || 0 : null,
@@ -278,22 +276,20 @@ export default function AdminPropertyForm({ mode = 'create', property }) {
       <div className="space-y-5">
         <SectionCard title="Basic information" description="Choose whether this is a property listing or a shortlet, then add its key details.">
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="sm:col-span-2"><TextField label="Property title *" value={form.title} onChange={(value) => setField('title', value)} error={errors.title} placeholder="e.g. 3 Bedroom Serviced Apartment" /></div>
-            <label className={labelClass}>Listing category *<select value={form.category} onChange={(event) => setField('category', event.target.value)} className={`${fieldClass} ${errors.category ? 'border-rose-400' : ''}`}><option>Property</option><option>Shortlet</option></select>{errors.category && <span className="mt-1 block text-[11px] text-rose-600">{errors.category}</span>}</label>
-            <label className={labelClass}>{form.category === 'Shortlet' ? 'Accommodation type *' : 'Property type *'}<select value={form.type} onChange={(event) => setField('type', event.target.value)} className={`${fieldClass} ${errors.type ? 'border-rose-400' : ''}`}><option value="">Select type</option>{(form.category === 'Shortlet' ? shortletTypes : propertyTypes).map((type) => <option key={type}>{type}</option>)}</select>{errors.type && <span className="mt-1 block text-[11px] text-rose-600">{errors.type}</span>}</label>
-            {form.category === 'Property' && <label className={labelClass}>Listing purpose *<select value={form.purpose} onChange={(event) => setField('purpose', event.target.value)} className={`${fieldClass} ${errors.purpose ? 'border-rose-400' : ''}`}><option>For Sale</option><option>For Rent</option></select>{errors.purpose && <span className="mt-1 block text-[11px] text-rose-600">{errors.purpose}</span>}</label>}
-            <TextField label={form.category === 'Shortlet' ? 'Nightly rate (₦) *' : 'Regular price (₦) *'} formatNumber value={form.price} onChange={(value) => setField('price', value)} error={errors.price} placeholder={form.category === 'Shortlet' ? 'e.g. 150,000' : 'e.g. 185,000,000'} />
-            <TextField label="Discounted price (₦)" formatNumber value={form.discountPrice} onChange={(value) => setField('discountPrice', value)} error={errors.discountPrice} placeholder="Optional" />
-            {form.discountPrice && parseAmount(form.price) > parseAmount(form.discountPrice) && <p className="-mt-2 text-xs text-emerald-800 sm:col-span-2">Discount: {Math.round((1 - parseAmount(form.discountPrice) / parseAmount(form.price)) * 100)}% off the regular price.</p>}
-            {form.category === 'Shortlet' && <TextField label="Maximum guests *" type="number" min="1" max="50" value={form.guests} onChange={(value) => setField('guests', value)} error={errors.guests} placeholder="e.g. 4" />}
+            <div className="order-8 sm:order-none sm:col-span-2"><TextField label="Property title *" value={form.title} onChange={(value) => setField('title', value)} error={errors.title} placeholder="e.g. 3 Bedroom Serviced Apartment" /></div>
+            <label className="order-1 block text-xs font-semibold text-slate-700 sm:order-none">Listing category *<select value={form.category} onChange={(event) => setField('category', event.target.value)} className={`${fieldClass} ${errors.category ? 'border-rose-400' : ''}`}><option>Property</option><option>Shortlet</option></select>{errors.category && <span className="mt-1 block text-[11px] text-rose-600">{errors.category}</span>}</label>
+            <label className="order-2 block text-xs font-semibold text-slate-700 sm:order-none">{form.category === 'Shortlet' ? 'Accommodation type *' : 'Property type *'}<select value={form.type} onChange={(event) => setField('type', event.target.value)} className={`${fieldClass} ${errors.type ? 'border-rose-400' : ''}`}><option value="">Select type</option>{(form.category === 'Shortlet' ? shortletTypes : propertyTypes).map((type) => <option key={type}>{type}</option>)}</select>{errors.type && <span className="mt-1 block text-[11px] text-rose-600">{errors.type}</span>}</label>
+            {form.category === 'Property' && <label className="order-4 block text-xs font-semibold text-slate-700 sm:order-none">Listing purpose *<select value={form.purpose} onChange={(event) => setField('purpose', event.target.value)} className={`${fieldClass} ${errors.purpose ? 'border-rose-400' : ''}`}><option>For Sale</option><option>For Rent</option></select>{errors.purpose && <span className="mt-1 block text-[11px] text-rose-600">{errors.purpose}</span>}</label>}
+            <TextField wrapperClassName="order-5 sm:order-none" label={form.category === 'Shortlet' ? 'Nightly rate (₦) *' : 'Regular price (₦) *'} formatNumber value={form.price} onChange={(value) => setField('price', value)} error={errors.price} placeholder={form.category === 'Shortlet' ? 'e.g. 150,000' : 'e.g. 185,000,000'} />
+            <TextField wrapperClassName="order-6 sm:order-none" label="Discounted price (₦)" formatNumber value={form.discountPrice} onChange={(value) => setField('discountPrice', value)} error={errors.discountPrice} placeholder="Optional" />
+            {form.discountPrice && parseAmount(form.price) > parseAmount(form.discountPrice) && <p className="order-7 -mt-2 text-xs text-emerald-800 sm:order-none sm:col-span-2">Discount: {Math.round((1 - parseAmount(form.discountPrice) / parseAmount(form.price)) * 100)}% off the regular price.</p>}
+            {form.category === 'Shortlet' && <TextField wrapperClassName="order-9 sm:order-none" label="Maximum guests *" type="number" min="1" max="50" value={form.guests} onChange={(value) => setField('guests', value)} error={errors.guests} placeholder="e.g. 4" />}
             {form.category === 'Shortlet' && <>
-              <TextField label="Available check-in date" type="date" value={form.checkin} onChange={(value) => setField('checkin', value)} placeholder="" />
-              <TextField label="Available check-out date" type="date" min={form.checkin || undefined} value={form.checkout} onChange={(value) => setField('checkout', value)} error={errors.checkout} placeholder="" />
-              <p className="-mt-2 text-xs leading-5 text-slate-500 sm:col-span-2">Optional availability dates for this shortlet. These don’t confirm a booking; Gate Homes still needs to confirm availability.</p>
+              <TextField wrapperClassName="order-10 sm:order-none" label="Available check-in date" type="date" value={form.checkin} onChange={(value) => setField('checkin', value)} placeholder="" />
+              <TextField wrapperClassName="order-11 sm:order-none" label="Available check-out date" type="date" min={form.checkin || undefined} value={form.checkout} onChange={(value) => setField('checkout', value)} error={errors.checkout} placeholder="" />
+              <p className="order-12 -mt-2 text-xs leading-5 text-slate-500 sm:order-none sm:col-span-2">Optional availability dates for this shortlet. These don’t confirm a booking; Gate Homes still needs to confirm availability.</p>
             </>}
-            <TextField label="Location *" list="property-location-suggestions" autoComplete="off" value={form.location} onChange={(value) => setField('location', value)} error={errors.location} placeholder="Type or choose a Lagos location" />
-            <datalist id="property-location-suggestions">{lagosLocationSuggestions.map((location) => <option key={location} value={location} />)}</datalist>
-            <div className="sm:col-span-2"><TextField label="Full address *" value={form.address} onChange={(value) => setField('address', value)} error={errors.address} placeholder="Street, estate or landmark, city" /></div>
+            <AdminLocationSelect wrapperClassName="order-3 sm:order-none sm:col-span-2" value={form.location} onChange={(value) => setField('location', value)} error={errors.location} />
           </div>
         </SectionCard>
 

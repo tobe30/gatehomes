@@ -124,7 +124,6 @@ function normalizeProperty(input: PropertyInput, adminId: string): PropertyValid
     if (!String(input?.type ?? "").trim()) return { ok: false, error: "Choose a property type." };
     if (price <= 0) return { ok: false, error: "Enter a price greater than zero." };
     if (!String(input?.location ?? "").trim()) return { ok: false, error: "Enter the listing location." };
-    if (!String(input?.address ?? "").trim()) return { ok: false, error: "Enter the full address." };
     if (!String(input?.description ?? "").trim()) return { ok: false, error: "Add a description." };
     if (category === "Shortlet" && Number(input?.guests) < 1) {
       return { ok: false, error: "Enter the shortlet's maximum guest capacity." };
